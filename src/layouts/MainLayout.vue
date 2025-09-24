@@ -1,11 +1,26 @@
 <template>
   <q-layout view="hHh lpR fFf">
-    <q-page-container>
+    <q-header elevated class="main-header">
+      <AppHeader />
+    </q-header>
+
+    <q-page-container class="main-page-container">
       <router-view />
     </q-page-container>
   </q-layout>
 </template>
 
 <script setup>
-// Removed Essential Links sidebar for cleaner chat interface
+import AppHeader from "../components/AppHeader.vue";
 </script>
+
+<style scoped>
+.main-header {
+  background: transparent;
+  box-shadow: none;
+}
+
+.main-page-container {
+  background: #ffffff;
+}
+</style>

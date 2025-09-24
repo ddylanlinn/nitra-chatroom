@@ -6,11 +6,11 @@
         <div class="chat-container__welcome">
           <q-avatar
             size="80px"
-            color="primary"
+            color="secondary"
             icon="smart_toy"
             class="chat-container__avatar"
           />
-          <h5 class="text-primary q-mt-md">Welcome to Nitra AI Chatroom</h5>
+          <h5 class="text-secondary q-mt-md">Welcome to Nitra AI!</h5>
           <p class="text-grey-7 q-mt-sm text-center">
             Ask me about medical supplies like gloves, ultrasound gel,<br />
             antibiotic ointments, surgical scissors, or masks.
@@ -156,7 +156,7 @@ onMounted(() => {
   height: 100vh;
   display: flex;
   flex-direction: column;
-  background: #fafafa;
+  background: #ffffff;
 }
 
 .chat-container__messages {
@@ -355,23 +355,33 @@ onMounted(() => {
   }
 }
 
-/* Dark mode support */
+/* Force light theme regardless of system preference */
 @media (prefers-color-scheme: dark) {
   .chat-container {
-    background: #121212;
+    background: #ffffff !important;
+    color: #333333 !important;
   }
 
   .chat-container__messages {
-    background: #121212;
+    background: #ffffff !important;
+    color: #333333 !important;
+  }
+
+  .chat-container__welcome h5 {
+    color: var(--q-secondary) !important;
+  }
+
+  .chat-container__welcome p {
+    color: #666666 !important;
   }
 
   .chat-container__typing-dots {
-    background: #2a2a2a;
-    border-color: #333;
+    background: #f5f5f5 !important;
+    border-color: #e0e0e0 !important;
   }
 
   .chat-container__typing-dots span {
-    background: #666;
+    background: #999 !important;
   }
 }
 

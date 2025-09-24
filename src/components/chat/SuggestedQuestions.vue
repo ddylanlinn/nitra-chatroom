@@ -44,7 +44,7 @@ const handleQuestionClick = (question: string) => {
 .suggested-questions {
   margin-top: 16px;
   padding: 16px;
-  background: #f8f9fa;
+  background: #ffffff;
   border-radius: 12px;
   border: 1px solid #e9ecef;
 }
@@ -73,6 +73,7 @@ const handleQuestionClick = (question: string) => {
   transition: all 0.2s ease;
   border-color: var(--q-primary);
   color: var(--q-primary);
+  background-color: rgba(255, 107, 53, 0.08);
 }
 
 .suggested-questions__chip:hover {
@@ -186,15 +187,22 @@ const handleQuestionClick = (question: string) => {
   }
 }
 
-/* Dark mode support */
+/* Force light theme regardless of system preference */
 @media (prefers-color-scheme: dark) {
   .suggested-questions {
-    background: #2a2a2a;
-    border-color: #404040;
+    background: #ffffff !important;
+    border-color: #e9ecef !important;
+    color: #333333 !important;
   }
 
   .suggested-questions__title {
-    color: #e0e0e0;
+    color: #495057 !important;
+  }
+  
+  .suggested-questions__chip {
+    background-color: rgba(255, 107, 53, 0.08) !important;
+    color: var(--q-primary) !important;
+    border-color: var(--q-primary) !important;
   }
 }
 </style>

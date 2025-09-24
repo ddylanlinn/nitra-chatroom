@@ -15,6 +15,7 @@ import ChatContainer from "../components/chat/ChatContainer.vue";
   height: 100dvh; /* Dynamic viewport height for mobile browsers */
   overflow: hidden;
   position: relative;
+  background: #ffffff;
 }
 
 /* Responsive Design */

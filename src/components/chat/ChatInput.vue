@@ -304,16 +304,26 @@ defineExpose({
   }
 }
 
-/* Dark mode support */
+/* Force light theme regardless of system preference */
 @media (prefers-color-scheme: dark) {
   .chat-input {
-    background: #1a1a1a;
-    border-top-color: #333;
+    background: #ffffff !important;
+    border-top-color: #e0e0e0 !important;
+    color: #333333 !important;
   }
 
   .chat-input__char-count {
-    background: rgba(26, 26, 26, 0.9);
-    color: #ccc;
+    background: rgba(255, 255, 255, 0.9) !important;
+    color: #666666 !important;
+  }
+  
+  .chat-input__field :deep(.q-field__control) {
+    background: #ffffff !important;
+    color: #333333 !important;
+  }
+
+  .chat-input__field :deep(.q-field__native) {
+    color: #333333 !important;
   }
 }
 </style>

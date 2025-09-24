@@ -32,7 +32,7 @@
     <!-- Avatar for assistant messages -->
     <div v-if="message.role === 'assistant'" class="message-bubble__avatar">
       <q-avatar
-        color="primary"
+        color="secondary"
         text-color="white"
         size="32px"
         icon="smart_toy"

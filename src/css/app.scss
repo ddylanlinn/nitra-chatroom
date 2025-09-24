@@ -1,5 +1,41 @@
 // app global css in SCSS form
 @import './responsive.scss';
+
+// Global body styling to ensure white background regardless of system theme
+html, body {
+  background-color: #ffffff !important;
+  color: #333333 !important;
+  color-scheme: light !important; /* Force light color scheme */
+}
+
+// Ensure Quasar body styling is overridden
+.q-layout,
+.q-page-container,
+.q-page {
+  background-color: #ffffff !important;
+  color: #333333 !important;
+}
+
+// Override any dark mode styles
+@media (prefers-color-scheme: dark) {
+  html, body {
+    background-color: #ffffff !important;
+    color: #333333 !important;
+    color-scheme: light !important;
+  }
+  
+  .q-layout,
+  .q-page-container,
+  .q-page {
+    background-color: #ffffff !important;
+    color: #333333 !important;
+  }
+  
+  .chat-container {
+    background-color: #ffffff !important;
+    color: #333333 !important;
+  }
+}
 $color-properties: (
   bg: "background-color",
   text: "color",
