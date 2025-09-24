@@ -199,20 +199,108 @@ defineExpose({
   transform: translateY(-1px);
 }
 
-/* Mobile responsiveness */
-@media (max-width: 600px) {
+/* Responsive Design */
+/* Large Desktop (1440px+) */
+@media (min-width: 1440px) {
   .chat-input {
-    padding: 12px;
+    padding: 20px 48px;
+  }
+
+  .chat-input__field :deep(.q-field__native) {
+    padding: 16px 20px;
+    font-size: 16px;
+  }
+
+  .chat-input__suggestions {
+    margin-top: 16px;
+  }
+}
+
+/* Desktop (1024px - 1439px) */
+@media (min-width: 1024px) and (max-width: 1439px) {
+  .chat-input {
+    padding: 18px 32px;
+  }
+
+  .chat-input__field :deep(.q-field__native) {
+    padding: 14px 18px;
+    font-size: 16px;
+  }
+}
+
+/* Tablet (768px - 1023px) */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .chat-input {
+    padding: 16px 24px;
+  }
+
+  .chat-input__field :deep(.q-field__native) {
+    padding: 12px 16px;
+    font-size: 16px;
+  }
+
+  .chat-input__send-btn {
+    margin-right: 6px;
+  }
+}
+
+/* Mobile Large (480px - 767px) */
+@media (min-width: 480px) and (max-width: 767px) {
+  .chat-input {
+    padding: 14px 20px;
+  }
+
+  .chat-input__field :deep(.q-field__native) {
+    padding: 12px 16px;
+    font-size: 16px; /* Prevent zoom on iOS */
+  }
+
+  .chat-input__char-count {
+    right: 75px;
+    font-size: 11px;
+  }
+
+  .chat-input__send-btn {
+    margin-right: 6px;
+  }
+}
+
+/* Mobile Small (up to 479px) */
+@media (max-width: 479px) {
+  .chat-input {
+    padding: 12px 16px;
+    /* Ensure input area is always visible above mobile keyboards */
+    padding-bottom: env(safe-area-inset-bottom, 12px);
+  }
+
+  .chat-input__field {
+    border-radius: 20px;
+  }
+
+  .chat-input__field :deep(.q-field__control) {
+    border-radius: 20px;
+    padding: 0 6px;
   }
 
   .chat-input__field :deep(.q-field__native) {
     padding: 10px 14px;
     font-size: 16px; /* Prevent zoom on iOS */
+    line-height: 1.3;
   }
 
   .chat-input__char-count {
-    right: 70px;
+    right: 65px;
     font-size: 10px;
+    bottom: 6px;
+  }
+
+  .chat-input__send-btn {
+    margin-right: 4px;
+    padding: 8px;
+  }
+
+  .chat-input__suggestions {
+    margin-top: 10px;
   }
 }
 

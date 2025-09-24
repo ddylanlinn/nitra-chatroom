@@ -1,0 +1,173 @@
+// Responsive Design System
+// Based on common breakpoints and device sizes
+
+// Breakpoint Variables
+$breakpoint-xs: 480px;
+$breakpoint-sm: 768px;
+$breakpoint-md: 1024px;
+$breakpoint-lg: 1440px;
+
+// Container max-widths
+$container-sm: 540px;
+$container-md: 720px;
+$container-lg: 960px;
+$container-xl: 1200px;
+
+// Responsive mixins
+@mixin mobile-small {
+  @media (max-width: #{$breakpoint-xs - 1px}) {
+    @content;
+  }
+}
+
+@mixin mobile-large {
+  @media (min-width: #{$breakpoint-xs}) and (max-width: #{$breakpoint-sm - 1px}) {
+    @content;
+  }
+}
+
+@mixin tablet {
+  @media (min-width: #{$breakpoint-sm}) and (max-width: #{$breakpoint-md - 1px}) {
+    @content;
+  }
+}
+
+@mixin desktop {
+  @media (min-width: #{$breakpoint-md}) and (max-width: #{$breakpoint-lg - 1px}) {
+    @content;
+  }
+}
+
+@mixin desktop-large {
+  @media (min-width: #{$breakpoint-lg}) {
+    @content;
+  }
+}
+
+// Utility classes for responsive design
+.container-responsive {
+  width: 100%;
+  margin: 0 auto;
+  padding: 0 16px;
+
+  @include mobile-large {
+    padding: 0 20px;
+  }
+
+  @include tablet {
+    padding: 0 24px;
+    max-width: $container-md;
+  }
+
+  @include desktop {
+    padding: 0 32px;
+    max-width: $container-lg;
+  }
+
+  @include desktop-large {
+    padding: 0 48px;
+    max-width: $container-xl;
+  }
+}
+
+// Responsive text sizes
+.text-responsive {
+  font-size: 14px;
+  line-height: 1.4;
+
+  @include mobile-large {
+    font-size: 14px;
+    line-height: 1.4;
+  }
+
+  @include tablet {
+    font-size: 15px;
+    line-height: 1.5;
+  }
+
+  @include desktop {
+    font-size: 16px;
+    line-height: 1.5;
+  }
+
+  @include desktop-large {
+    font-size: 16px;
+    line-height: 1.5;
+  }
+}
+
+// Responsive spacing
+.spacing-responsive {
+  padding: 12px;
+
+  @include mobile-large {
+    padding: 14px;
+  }
+
+  @include tablet {
+    padding: 16px;
+  }
+
+  @include desktop {
+    padding: 20px;
+  }
+
+  @include desktop-large {
+    padding: 24px;
+  }
+}
+
+// Hide/show elements at different breakpoints
+.hide-mobile {
+  @include mobile-small {
+    display: none !important;
+  }
+  @include mobile-large {
+    display: none !important;
+  }
+}
+
+.hide-tablet {
+  @include tablet {
+    display: none !important;
+  }
+}
+
+.hide-desktop {
+  @include desktop {
+    display: none !important;
+  }
+  @include desktop-large {
+    display: none !important;
+  }
+}
+
+.show-mobile-only {
+  display: none !important;
+  
+  @include mobile-small {
+    display: block !important;
+  }
+  @include mobile-large {
+    display: block !important;
+  }
+}
+
+.show-tablet-only {
+  display: none !important;
+  
+  @include tablet {
+    display: block !important;
+  }
+}
+
+.show-desktop-only {
+  display: none !important;
+  
+  @include desktop {
+    display: block !important;
+  }
+  @include desktop-large {
+    display: block !important;
+  }
+}

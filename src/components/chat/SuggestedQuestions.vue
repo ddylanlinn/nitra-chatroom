@@ -85,19 +85,104 @@ const handleQuestionClick = (question: string) => {
   line-height: 1.4;
 }
 
-/* Mobile responsiveness */
-@media (max-width: 600px) {
+/* Responsive Design */
+/* Large Desktop (1440px+) */
+@media (min-width: 1440px) {
   .suggested-questions {
-    margin-top: 12px;
+    margin: 20px 48px 0;
+    padding: 18px 20px;
+    border-radius: 16px;
+  }
+
+  .suggested-questions__list {
+    gap: 10px;
+  }
+
+  .suggested-questions__chip :deep(.q-chip__content) {
+    font-size: 14px;
+    padding: 8px 12px;
+  }
+}
+
+/* Desktop (1024px - 1439px) */
+@media (min-width: 1024px) and (max-width: 1439px) {
+  .suggested-questions {
+    margin: 18px 32px 0;
+    padding: 16px 18px;
+  }
+
+  .suggested-questions__list {
+    gap: 9px;
+  }
+
+  .suggested-questions__chip :deep(.q-chip__content) {
+    font-size: 13px;
+    padding: 7px 11px;
+  }
+}
+
+/* Tablet (768px - 1023px) */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .suggested-questions {
+    margin: 16px 24px 0;
+    padding: 16px;
+  }
+
+  .suggested-questions__list {
+    gap: 8px;
+  }
+
+  .suggested-questions__chip :deep(.q-chip__content) {
+    font-size: 13px;
+    padding: 6px 10px;
+  }
+}
+
+/* Mobile Large (480px - 767px) */
+@media (min-width: 480px) and (max-width: 767px) {
+  .suggested-questions {
+    margin: 14px 20px 0;
+    padding: 14px;
+  }
+
+  .suggested-questions__list {
+    gap: 7px;
+  }
+
+  .suggested-questions__chip :deep(.q-chip__content) {
+    font-size: 12px;
+    padding: 6px 10px;
+  }
+}
+
+/* Mobile Small (up to 479px) */
+@media (max-width: 479px) {
+  .suggested-questions {
+    margin: 12px 16px 0;
     padding: 12px;
+    border-radius: 10px;
+  }
+
+  .suggested-questions__header {
+    margin-bottom: 10px;
+  }
+
+  .suggested-questions__title {
+    font-size: 13px;
   }
 
   .suggested-questions__list {
     gap: 6px;
   }
 
+  .suggested-questions__chip {
+    font-size: 11px;
+  }
+
   .suggested-questions__chip :deep(.q-chip__content) {
-    font-size: 12px;
+    font-size: 11px;
+    padding: 5px 8px;
+    line-height: 1.3;
   }
 }
 

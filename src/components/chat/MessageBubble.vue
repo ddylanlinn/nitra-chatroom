@@ -233,15 +233,116 @@ const formatTimestamp = (timestamp: string) => {
   flex-shrink: 0;
 }
 
-/* Mobile responsiveness */
-@media (max-width: 600px) {
+/* Responsive Design */
+/* Large Desktop (1440px+) */
+@media (min-width: 1440px) {
   .message-bubble__content {
-    max-width: 85%;
+    max-width: 65%;
+    min-width: 160px;
   }
 
   .message-bubble--user .message-bubble__content,
   .message-bubble--assistant .message-bubble__content {
+    padding: 14px 20px;
+  }
+
+  .message-bubble__text {
+    font-size: 16px;
+    line-height: 1.5;
+  }
+}
+
+/* Desktop (1024px - 1439px) */
+@media (min-width: 1024px) and (max-width: 1439px) {
+  .message-bubble__content {
+    max-width: 70%;
+    min-width: 140px;
+  }
+
+  .message-bubble--user .message-bubble__content,
+  .message-bubble--assistant .message-bubble__content {
+    padding: 12px 18px;
+  }
+}
+
+/* Tablet (768px - 1023px) */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .message-bubble__content {
+    max-width: 75%;
+    min-width: 120px;
+  }
+
+  .message-bubble--user .message-bubble__content,
+  .message-bubble--assistant .message-bubble__content {
+    padding: 12px 16px;
+  }
+
+  .message-bubble__avatar {
+    margin-right: 8px;
+  }
+}
+
+/* Mobile Large (480px - 767px) */
+@media (min-width: 480px) and (max-width: 767px) {
+  .message-bubble__content {
+    max-width: 80%;
+    min-width: 100px;
+  }
+
+  .message-bubble--user .message-bubble__content,
+  .message-bubble--assistant .message-bubble__content {
+    padding: 10px 14px;
+  }
+
+  .message-bubble__text {
+    font-size: 14px;
+    line-height: 1.4;
+  }
+
+  .message-bubble__timestamp {
+    font-size: 10px;
+  }
+
+  .message-bubble__avatar {
+    margin-right: 6px;
+  }
+}
+
+/* Mobile Small (up to 479px) */
+@media (max-width: 479px) {
+  .message-bubble {
+    margin-bottom: 12px;
+  }
+
+  .message-bubble__content {
+    max-width: 85%;
+    min-width: 80px;
+  }
+
+  .message-bubble--user .message-bubble__content,
+  .message-bubble--assistant .message-bubble__content {
+    padding: 10px 12px;
     margin: 0;
+  }
+
+  .message-bubble__text {
+    font-size: 14px;
+    line-height: 1.4;
+  }
+
+  .message-bubble__timestamp {
+    font-size: 10px;
+    margin-top: 2px;
+  }
+
+  .message-bubble__avatar {
+    margin-right: 4px;
+  }
+
+  .message-bubble__avatar .q-avatar {
+    width: 28px !important;
+    height: 28px !important;
+    font-size: 14px !important;
   }
 }
 </style>

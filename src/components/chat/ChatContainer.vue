@@ -260,22 +260,98 @@ onMounted(() => {
   }
 }
 
-/* Mobile responsiveness */
-@media (max-width: 600px) {
+/* Responsive Design */
+/* Large Desktop (1440px+) */
+@media (min-width: 1440px) {
   .chat-container {
-    height: 100vh;
+    max-width: 1200px;
+    margin: 0 auto;
   }
 
   .chat-container__messages {
-    padding: 12px;
+    padding: 24px 48px;
   }
 
   .chat-container__welcome {
-    max-width: 300px;
+    max-width: 500px;
+  }
+}
+
+/* Desktop (1024px - 1439px) */
+@media (min-width: 1024px) and (max-width: 1439px) {
+  .chat-container__messages {
+    padding: 20px 32px;
+  }
+
+  .chat-container__welcome {
+    max-width: 450px;
+  }
+}
+
+/* Tablet (768px - 1023px) */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .chat-container__messages {
+    padding: 16px 24px;
+  }
+
+  .chat-container__welcome {
+    max-width: 400px;
+  }
+
+  .chat-container__welcome h5 {
+    font-size: 1.3rem;
+  }
+}
+
+/* Mobile Large (480px - 767px) */
+@media (min-width: 480px) and (max-width: 767px) {
+  .chat-container__messages {
+    padding: 14px 20px;
+  }
+
+  .chat-container__welcome {
+    max-width: 320px;
+  }
+
+  .chat-container__welcome h5 {
+    font-size: 1.2rem;
   }
 
   .chat-container__welcome p {
     font-size: 14px;
+    line-height: 1.5;
+  }
+}
+
+/* Mobile Small (up to 479px) */
+@media (max-width: 479px) {
+  .chat-container {
+    height: 100vh;
+    height: 100dvh; /* Dynamic viewport height for mobile browsers */
+  }
+
+  .chat-container__messages {
+    padding: 12px 16px;
+  }
+
+  .chat-container__welcome {
+    max-width: 280px;
+  }
+
+  .chat-container__welcome h5 {
+    font-size: 1.1rem;
+    margin-bottom: 8px;
+  }
+
+  .chat-container__welcome p {
+    font-size: 13px;
+    line-height: 1.4;
+  }
+
+  .chat-container__avatar {
+    width: 60px !important;
+    height: 60px !important;
+    font-size: 1.5rem !important;
   }
 }
 

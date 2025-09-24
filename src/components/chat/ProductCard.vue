@@ -196,4 +196,128 @@ const handleImageError = () => {
     color: #888;
   }
 }
+
+/* Responsive Design */
+/* Large Desktop (1440px+) */
+@media (min-width: 1440px) {
+  .product-card {
+    max-width: 320px;
+  }
+
+  .product-card__image-container {
+    height: 180px;
+  }
+
+  .product-card__name {
+    font-size: 16px;
+    min-height: 45px;
+  }
+
+  .product-card:hover {
+    transform: translateY(-4px);
+  }
+}
+
+/* Desktop (1024px - 1439px) */
+@media (min-width: 1024px) and (max-width: 1439px) {
+  .product-card {
+    max-width: 300px;
+  }
+
+  .product-card__image-container {
+    height: 160px;
+  }
+
+  .product-card__name {
+    min-height: 42px;
+  }
+}
+
+/* Tablet (768px - 1023px) */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .product-card {
+    max-width: 280px;
+  }
+
+  .product-card__image-container {
+    height: 140px;
+  }
+
+  .product-card__name {
+    font-size: 15px;
+    min-height: 40px;
+  }
+}
+
+/* Mobile Large (480px - 767px) */
+@media (min-width: 480px) and (max-width: 767px) {
+  .product-card {
+    max-width: 100%;
+  }
+
+  .product-card__image-container {
+    height: 120px;
+  }
+
+  .product-card__name {
+    font-size: 14px;
+    min-height: 36px;
+  }
+
+  .product-card:hover {
+    transform: translateY(-1px);
+  }
+}
+
+/* Mobile Small (up to 479px) */
+@media (max-width: 479px) {
+  .product-card {
+    max-width: 100%;
+    border-radius: 6px;
+    margin: 6px 0;
+  }
+
+  .product-card__image-container {
+    height: 100px;
+  }
+
+  .product-card__name {
+    font-size: 14px;
+    min-height: 32px;
+    line-height: 1.3;
+  }
+
+  .product-card__vendor,
+  .product-card__brand {
+    font-size: 12px;
+  }
+
+  .product-card__price {
+    font-size: 15px;
+  }
+
+  /* Disable hover effects on touch devices */
+  .product-card:hover {
+    transform: none;
+    box-shadow: none;
+  }
+
+  /* Add touch feedback instead */
+  .product-card:active {
+    transform: scale(0.98);
+  }
+
+  /* Card sections responsive spacing */
+  .product-card :deep(.q-card__section) {
+    padding: 12px 14px;
+  }
+
+  .product-card :deep(.q-card__actions) {
+    padding: 8px 14px 12px;
+  }
+
+  .product-card__no-image .q-icon {
+    font-size: 2rem;
+  }
+}
 </style>
