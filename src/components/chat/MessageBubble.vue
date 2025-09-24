@@ -9,8 +9,20 @@
     ]"
   >
     <div class="message-bubble__content">
-      <!-- Message text with markdown support -->
+      <!-- Message text with typing animation for assistant -->
       <div
+        v-if="message.role === 'assistant' && shouldUseTypingAnimation"
+        class="message-bubble__text"
+        @click="skipAnimation"
+        :class="{ 'message-bubble__text--clickable': !typing.isCompleted }"
+      >
+        <span v-html="formattedTypingContent"></span>
+        <span v-if="!typing.isCompleted" class="message-bubble__cursor">|</span>
+      </div>
+
+      <!-- Static message text for user or when animation is disabled -->
+      <div
+        v-else
         class="message-bubble__text"
         v-html="formattedContent"
       ></div>
@@ -37,29 +49,78 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, onMounted, onUnmounted } from 'vue'
+import { useTypingAnimation } from '../../composables/useTypingAnimation'
 import type { Message } from '../../types'
 
 interface Props {
   message: Message
+  enableTypingAnimation?: boolean
 }
 
-const props = defineProps<Props>()
+const props = withDefaults(defineProps<Props>(), {
+  enableTypingAnimation: true
+})
+
+// Typing animation setup
+const shouldUseTypingAnimation = computed(() => {
+  return props.message.role === 'assistant' && props.enableTypingAnimation
+})
+
+const typing = useTypingAnimation(
+  props.message.content,
+  {
+    speed: 30, // 30ms per character for smooth typing
+    delay: 300 // 300ms delay before starting
+  }
+)
+
+// Format markdown content
+const formatMarkdown = (content: string) => {
+  let formatted = content
+
+  // Convert **bold** to <strong>
+  formatted = formatted.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+
+  // Convert [text](url) to <a>
+  formatted = formatted.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>')
+
+  // Convert line breaks to <br>
+  formatted = formatted.replace(/\n/g, '<br>')
+
+  return formatted
+}
+
+// Format typing content with markdown support
+const formattedTypingContent = computed(() => {
+  return formatMarkdown(typing.displayedText.value)
+})
 
 // Format message content with basic markdown support
 const formattedContent = computed(() => {
-  let content = props.message.content
+  return formatMarkdown(props.message.content)
+})
 
-  // Convert **bold** to <strong>
-  content = content.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+// Animation control
+const startAnimation = () => {
+  if (shouldUseTypingAnimation.value) {
+    typing.startTyping()
+  }
+}
 
-  // Convert [text](url) to <a>
-  content = content.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>')
+const skipAnimation = () => {
+  if (shouldUseTypingAnimation.value && !typing.isCompleted.value) {
+    typing.skipTyping()
+  }
+}
 
-  // Convert line breaks to <br>
-  content = content.replace(/\n/g, '<br>')
+// Lifecycle
+onMounted(() => {
+  startAnimation()
+})
 
-  return content
+onUnmounted(() => {
+  typing.cleanup()
 })
 
 // Format timestamp for display
@@ -139,6 +200,22 @@ const formatTimestamp = (timestamp: string) => {
 
 .message-bubble__text :deep(a:hover) {
   opacity: 0.8;
+}
+
+.message-bubble__text--clickable {
+  cursor: pointer;
+  user-select: none;
+}
+
+.message-bubble__cursor {
+  color: var(--q-primary);
+  animation: blink 1s infinite;
+  font-weight: normal;
+}
+
+@keyframes blink {
+  0%, 50% { opacity: 1; }
+  51%, 100% { opacity: 0; }
 }
 
 .message-bubble__timestamp {

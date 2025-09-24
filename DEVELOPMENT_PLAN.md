@@ -147,19 +147,19 @@ Build an AI chatroom interface for smart procurement that helps customers find a
 
 #### Tasks:
 
-- [ ] **2.3.1** Create typing animation composable
+- [x] **2.3.1** Create typing animation composable
 
   - Create `useTypingAnimation.ts`
   - Implement character-by-character display logic
   - Set configurable animation speed
 
-- [ ] **2.3.2** Implement markdown support
+- [x] **2.3.2** Implement markdown support
 
   - Add markdown parsing functionality
   - Handle formatted text
   - Support links and bold text
 
-- [ ] **2.3.3** Integrate animation into message components
+- [x] **2.3.3** Integrate animation into message components
   - Integrate typing animation into `MessageBubble`
   - Implement animation state management
   - Add animation completion callbacks

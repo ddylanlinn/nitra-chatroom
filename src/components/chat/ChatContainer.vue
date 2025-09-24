@@ -19,14 +19,15 @@
           v-for="message in messages"
           :key="message.id"
           :message="message"
+          :enable-typing-animation="true"
           class="chat-container__message"
         />
 
-        <!-- Typing indicator -->
-        <div v-if="isLoading" class="chat-container__typing">
-          <div class="chat-container__typing-bubble">
+        <!-- Loading indicator (only when waiting for response) -->
+        <div v-if="isLoading && messages.length === 0" class="chat-container__loading">
+          <div class="chat-container__loading-bubble">
             <q-avatar size="32px" color="primary" icon="smart_toy" />
-            <div class="chat-container__typing-dots">
+            <div class="chat-container__loading-dots">
               <span></span>
               <span></span>
               <span></span>
@@ -161,17 +162,17 @@ onMounted(() => {
   animation: messageSlideIn 0.3s ease-out;
 }
 
-.chat-container__typing {
+.chat-container__loading {
   margin: 16px 0;
 }
 
-.chat-container__typing-bubble {
+.chat-container__loading-bubble {
   display: flex;
   align-items: flex-end;
   gap: 8px;
 }
 
-.chat-container__typing-dots {
+.chat-container__loading-dots {
   display: flex;
   gap: 4px;
   padding: 12px 16px;
@@ -180,7 +181,7 @@ onMounted(() => {
   border: 1px solid #e0e0e0;
 }
 
-.chat-container__typing-dots span {
+.chat-container__loading-dots span {
   width: 6px;
   height: 6px;
   background: #999;
@@ -188,11 +189,11 @@ onMounted(() => {
   animation: typingDot 1.4s infinite ease-in-out;
 }
 
-.chat-container__typing-dots span:nth-child(2) {
+.chat-container__loading-dots span:nth-child(2) {
   animation-delay: 0.2s;
 }
 
-.chat-container__typing-dots span:nth-child(3) {
+.chat-container__loading-dots span:nth-child(3) {
   animation-delay: 0.4s;
 }
 
