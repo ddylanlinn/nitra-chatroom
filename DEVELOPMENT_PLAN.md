@@ -317,7 +317,7 @@ Build an AI chatroom interface for smart procurement that helps customers find a
 
 - [x] Mock data parsing complete
 - [x] Chat interface built
-- [ ] Typing animation implemented
+- [x] Typing animation implemented
 
 ### Milestone 3: UI/UX Polish Complete
 

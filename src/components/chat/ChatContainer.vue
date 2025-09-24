@@ -4,10 +4,15 @@
     <div ref="messagesRef" class="chat-container__messages">
       <div v-if="messages.length === 0" class="chat-container__empty">
         <div class="chat-container__welcome">
-          <q-avatar size="80px" color="primary" icon="smart_toy" class="chat-container__avatar" />
+          <q-avatar
+            size="80px"
+            color="primary"
+            icon="smart_toy"
+            class="chat-container__avatar"
+          />
           <h5 class="text-primary q-mt-md">Welcome to Nitra AI Chatroom</h5>
           <p class="text-grey-7 q-mt-sm text-center">
-            Ask me about medical supplies like gloves, ultrasound gel,<br>
+            Ask me about medical supplies like gloves, ultrasound gel,<br />
             antibiotic ointments, surgical scissors, or masks.
           </p>
         </div>
@@ -24,7 +29,10 @@
         />
 
         <!-- Loading indicator (only when waiting for response) -->
-        <div v-if="isLoading && messages.length === 0" class="chat-container__loading">
+        <div
+          v-if="isLoading && messages.length === 0"
+          class="chat-container__loading"
+        >
           <div class="chat-container__loading-bubble">
             <q-avatar size="32px" color="primary" icon="smart_toy" />
             <div class="chat-container__loading-dots">
@@ -55,51 +63,50 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, nextTick, watch, onMounted } from 'vue'
-import { useChatStore } from '../../stores/chat'
-import MessageBubble from './MessageBubble.vue'
-import ChatInput from './ChatInput.vue'
-import SuggestedQuestions from './SuggestedQuestions.vue'
-import { useSuggestedQuestions } from '../../composables/useSuggestedQuestions'
-import type { Message } from '../../types'
+import { ref, computed, nextTick, watch, onMounted } from "vue";
+import { useChatStore } from "../../stores/chat";
+import MessageBubble from "./MessageBubble.vue";
+import ChatInput from "./ChatInput.vue";
+import SuggestedQuestions from "./SuggestedQuestions.vue";
+import { useSuggestedQuestions } from "../../composables/useSuggestedQuestions";
+import type { Message } from "../../types";
 
-const chatStore = useChatStore()
-const suggestedQuestions = useSuggestedQuestions()
+const chatStore = useChatStore();
+const suggestedQuestions = useSuggestedQuestions();
 
 // Refs
-const messagesRef = ref<HTMLElement>()
-const inputRef = ref()
+const messagesRef = ref<HTMLElement>();
+const inputRef = ref();
 
 // Computed
-const messages = computed(() => chatStore.messages)
-const isLoading = computed(() => chatStore.isLoading)
+const messages = computed(() => chatStore.messages);
+const isLoading = computed(() => chatStore.isLoading);
 
 // Handle suggested question click
 const handleSuggestedQuestionClick = (question: string) => {
-  handleSendMessage(question)
-}
+  handleSendMessage(question);
+};
 
 // Methods
 const handleSendMessage = async (message: string) => {
-  await chatStore.sendMessage(message)
-}
-
+  await chatStore.sendMessage(message);
+};
 
 // Auto-scroll to bottom when new messages arrive
 const scrollToBottom = async () => {
-  await nextTick()
+  await nextTick();
   if (messagesRef.value) {
-    messagesRef.value.scrollTop = messagesRef.value.scrollHeight
+    messagesRef.value.scrollTop = messagesRef.value.scrollHeight;
   }
-}
+};
 
 // Watch for new messages and scroll
 watch(
   () => messages.value.length,
   () => {
-    scrollToBottom()
+    scrollToBottom();
   }
-)
+);
 
 // Watch for loading state changes
 watch(
@@ -107,21 +114,21 @@ watch(
   () => {
     if (!isLoading.value) {
       // Scroll when loading completes (message finished)
-      setTimeout(scrollToBottom, 100)
+      setTimeout(scrollToBottom, 100);
     }
   }
-)
+);
 
 // Watch for new messages to parse suggested questions
 watch(
   () => messages.value.length,
   () => {
-    const lastMessage = messages.value[messages.value.length - 1]
-    if (lastMessage && lastMessage.role === 'assistant') {
-      suggestedQuestions.parseSuggestedQuestions(lastMessage.content)
+    const lastMessage = messages.value[messages.value.length - 1];
+    if (lastMessage && lastMessage.role === "assistant") {
+      suggestedQuestions.parseSuggestedQuestions(lastMessage.content);
     }
   }
-)
+);
 
 // Watch for new assistant messages to update suggestions
 watch(
@@ -129,19 +136,19 @@ watch(
   (newMessages) => {
     const lastAssistantMessage = [...newMessages]
       .reverse()
-      .find(msg => msg.role === 'assistant')
+      .find((msg) => msg.role === "assistant");
 
     if (lastAssistantMessage) {
-      suggestedQuestions.parseSuggestedQuestions(lastAssistantMessage.content)
+      suggestedQuestions.parseSuggestedQuestions(lastAssistantMessage.content);
     }
   },
   { deep: true }
-)
+);
 
 // Scroll to bottom on mount
 onMounted(() => {
-  scrollToBottom()
-})
+  scrollToBottom();
+});
 </script>
 
 <style scoped>
@@ -241,7 +248,9 @@ onMounted(() => {
 }
 
 @keyframes typingDot {
-  0%, 60%, 100% {
+  0%,
+  60%,
+  100% {
     transform: translateY(0);
     opacity: 0.4;
   }
