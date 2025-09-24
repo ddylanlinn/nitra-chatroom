@@ -30,10 +30,16 @@ import EssentialLink from 'components/EssentialLink.vue'
 
 const linksList = [
   {
+    title: 'AI Chat',
+    caption: 'Nitra AI Chatroom',
+    icon: 'chat',
+    to: '/chat'
+  },
+  {
     title: 'Home',
     caption: 'Home',
     icon: 'home',
-    to: '/'
+    to: '/home'
   },
   {
     title: 'Colors',
