@@ -118,25 +118,25 @@ Build an AI chatroom interface for smart procurement that helps customers find a
 
 #### Tasks:
 
-- [ ] **2.2.1** Create message bubble component
+- [x] **2.2.1** Create message bubble component
 
   - Create `MessageBubble.vue`
   - Implement user vs assistant styling
   - Add timestamp display
 
-- [ ] **2.2.2** Create product card component
+- [x] **2.2.2** Create product card component
 
   - Create `ProductCard.vue`
   - Implement product information display
   - Add clickable product links
 
-- [ ] **2.2.3** Create chat input component
+- [x] **2.2.3** Create chat input component
 
   - Create `ChatInput.vue`
   - Implement input validation
   - Add send button functionality
 
-- [ ] **2.2.4** Create chat container component
+- [x] **2.2.4** Create chat container component
   - Create `ChatContainer.vue`
   - Implement message list display
   - Add auto-scroll functionality

@@ -1,0 +1,282 @@
+<template>
+  <div class="chat-container">
+    <!-- Chat Messages Area -->
+    <div ref="messagesRef" class="chat-container__messages">
+      <div v-if="messages.length === 0" class="chat-container__empty">
+        <div class="chat-container__welcome">
+          <q-avatar size="80px" color="primary" icon="smart_toy" class="chat-container__avatar" />
+          <h5 class="text-primary q-mt-md">Welcome to Nitra AI Chatroom</h5>
+          <p class="text-grey-7 q-mt-sm text-center">
+            Ask me about medical supplies like gloves, ultrasound gel,<br>
+            antibiotic ointments, surgical scissors, or masks.
+          </p>
+        </div>
+      </div>
+
+      <!-- Messages List -->
+      <div v-else class="chat-container__message-list">
+        <MessageBubble
+          v-for="message in messages"
+          :key="message.id"
+          :message="message"
+          class="chat-container__message"
+        />
+
+        <!-- Typing indicator -->
+        <div v-if="isLoading" class="chat-container__typing">
+          <div class="chat-container__typing-bubble">
+            <q-avatar size="32px" color="primary" icon="smart_toy" />
+            <div class="chat-container__typing-dots">
+              <span></span>
+              <span></span>
+              <span></span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Chat Input -->
+    <ChatInput
+      ref="inputRef"
+      :is-loading="isLoading"
+      :suggested-question="currentSuggestedQuestion"
+      @send="handleSendMessage"
+      @suggestion-click="handleSuggestionClick"
+      class="chat-container__input"
+    />
+  </div>
+</template>
+
+<script setup lang="ts">
+import { ref, computed, nextTick, watch, onMounted } from 'vue'
+import { useChatStore } from '../../stores/chat'
+import MessageBubble from './MessageBubble.vue'
+import ChatInput from './ChatInput.vue'
+import type { Message } from '../../types'
+
+const chatStore = useChatStore()
+
+// Refs
+const messagesRef = ref<HTMLElement>()
+const inputRef = ref()
+
+// Computed
+const messages = computed(() => chatStore.messages)
+const isLoading = computed(() => chatStore.isLoading)
+
+// Current suggested question from last assistant message
+const currentSuggestedQuestion = computed(() => {
+  const lastMessage = chatStore.lastMessage
+  if (lastMessage?.role === 'assistant') {
+    // Extract suggested question from message content
+    const match = lastMessage.content.match(/Suggested Question:\s*(.+?)(?:\n|$)/i)
+    return match ? match[1].trim() : undefined
+  }
+  return undefined
+})
+
+// Methods
+const handleSendMessage = async (message: string) => {
+  await chatStore.sendMessage(message)
+}
+
+const handleSuggestionClick = (question: string) => {
+  inputRef.value?.focus()
+  // The input component will handle sending the message
+  handleSendMessage(question)
+}
+
+// Auto-scroll to bottom when new messages arrive
+const scrollToBottom = async () => {
+  await nextTick()
+  if (messagesRef.value) {
+    messagesRef.value.scrollTop = messagesRef.value.scrollHeight
+  }
+}
+
+// Watch for new messages and scroll
+watch(
+  () => messages.value.length,
+  () => {
+    scrollToBottom()
+  }
+)
+
+// Watch for loading state changes
+watch(
+  () => isLoading.value,
+  () => {
+    if (!isLoading.value) {
+      // Scroll when loading completes (message finished)
+      setTimeout(scrollToBottom, 100)
+    }
+  }
+)
+
+// Scroll to bottom on mount
+onMounted(() => {
+  scrollToBottom()
+})
+</script>
+
+<style scoped>
+.chat-container {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: #fafafa;
+}
+
+.chat-container__messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px;
+  scroll-behavior: smooth;
+}
+
+.chat-container__empty {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.chat-container__welcome {
+  text-align: center;
+  max-width: 400px;
+}
+
+.chat-container__avatar {
+  margin: 0 auto;
+}
+
+.chat-container__message-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.chat-container__message {
+  animation: messageSlideIn 0.3s ease-out;
+}
+
+.chat-container__typing {
+  margin: 16px 0;
+}
+
+.chat-container__typing-bubble {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+}
+
+.chat-container__typing-dots {
+  display: flex;
+  gap: 4px;
+  padding: 12px 16px;
+  background: #f5f5f5;
+  border-radius: 18px 18px 18px 4px;
+  border: 1px solid #e0e0e0;
+}
+
+.chat-container__typing-dots span {
+  width: 6px;
+  height: 6px;
+  background: #999;
+  border-radius: 50%;
+  animation: typingDot 1.4s infinite ease-in-out;
+}
+
+.chat-container__typing-dots span:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.chat-container__typing-dots span:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+.chat-container__input {
+  flex-shrink: 0;
+}
+
+/* Animations */
+@keyframes messageSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes typingDot {
+  0%, 60%, 100% {
+    transform: translateY(0);
+    opacity: 0.4;
+  }
+  30% {
+    transform: translateY(-8px);
+    opacity: 1;
+  }
+}
+
+/* Mobile responsiveness */
+@media (max-width: 600px) {
+  .chat-container {
+    height: 100vh;
+  }
+
+  .chat-container__messages {
+    padding: 12px;
+  }
+
+  .chat-container__welcome {
+    max-width: 300px;
+  }
+
+  .chat-container__welcome p {
+    font-size: 14px;
+  }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .chat-container {
+    background: #121212;
+  }
+
+  .chat-container__messages {
+    background: #121212;
+  }
+
+  .chat-container__typing-dots {
+    background: #2a2a2a;
+    border-color: #333;
+  }
+
+  .chat-container__typing-dots span {
+    background: #666;
+  }
+}
+
+/* Scrollbar styling */
+.chat-container__messages::-webkit-scrollbar {
+  width: 6px;
+}
+
+.chat-container__messages::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.chat-container__messages::-webkit-scrollbar-thumb {
+  background: #ccc;
+  border-radius: 3px;
+}
+
+.chat-container__messages::-webkit-scrollbar-thumb:hover {
+  background: #999;
+}
+</style>
