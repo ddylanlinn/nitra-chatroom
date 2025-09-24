@@ -315,8 +315,8 @@ Build an AI chatroom interface for smart procurement that helps customers find a
 
 ### Milestone 2: Core Features Complete
 
-- [ ] Mock data parsing complete
-- [ ] Chat interface built
+- [x] Mock data parsing complete
+- [x] Chat interface built
 - [ ] Typing animation implemented
 
 ### Milestone 3: UI/UX Polish Complete
