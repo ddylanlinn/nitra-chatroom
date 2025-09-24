@@ -5,7 +5,7 @@
 </template>
 
 <script setup lang="ts">
-import ChatContainer from '../components/chat/ChatContainer.vue'
+import ChatContainer from "../components/chat/ChatContainer.vue";
 </script>
 
 <style scoped>

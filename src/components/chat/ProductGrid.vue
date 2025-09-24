@@ -4,7 +4,7 @@
       <q-icon name="shopping_cart" size="sm" color="primary" />
       <span class="product-grid__title">Products</span>
     </div>
-    
+
     <div class="product-grid__container">
       <ProductCard
         v-for="(product, index) in products"
@@ -17,14 +17,14 @@
 </template>
 
 <script setup lang="ts">
-import ProductCard from './ProductCard.vue'
-import type { ProductInfo } from '../../types'
+import ProductCard from "./ProductCard.vue";
+import type { ProductInfo } from "../../types";
 
 interface Props {
-  products?: ProductInfo[]
+  products?: ProductInfo[];
 }
 
-defineProps<Props>()
+defineProps<Props>();
 </script>
 
 <style scoped>
