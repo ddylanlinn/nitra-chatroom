@@ -76,12 +76,12 @@ Build an AI chatroom interface for smart procurement that helps customers find a
 
 #### Tasks:
 
-- [ ] **1.3.1** Setup SCSS variables
+- [x] **1.3.1** Setup SCSS variables
 
   - Define color palette (Gray, Teal, Status colors)
   - Set up font size system
 
-- [ ] **1.3.2** Configure Quasar theme
+- [x] **1.3.2** Configure Quasar theme
   - Configure primary colors
   - Setup dark mode support
 
@@ -309,9 +309,9 @@ Build an AI chatroom interface for smart procurement that helps customers find a
 
 ### Milestone 1: Foundation Complete
 
-- [ ] Project setup complete
-- [ ] Routing and layout established
-- [ ] Design system setup complete
+- [x] Project setup complete
+- [x] Routing and layout established
+- [x] Design system setup complete
 
 ### Milestone 2: Core Features Complete
 

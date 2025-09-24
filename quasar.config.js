@@ -72,7 +72,18 @@ export default defineConfig((/* ctx */) => {
 
     // https://v2.quasar.dev/quasar-cli-vite/quasar-config-file#framework
     framework: {
-      config: {},
+      config: {
+        brand: {
+          primary: '#264D4F', // teal-700
+          secondary: '#115383', // blue-700
+          accent: '#FB7429', // orange-400
+          positive: '#15B471', // green-500
+          negative: '#C71A1A', // red-500
+          info: '#1A7EC7', // blue-500
+          warning: '#E89519', // amber-500
+          dark: '#1D1D1D'
+        }
+      },
 
       // iconSet: 'material-icons', // Quasar icon set
       // lang: 'en-US', // Quasar language pack
