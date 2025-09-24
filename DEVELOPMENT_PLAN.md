@@ -170,13 +170,13 @@ Build an AI chatroom interface for smart procurement that helps customers find a
 
 #### Tasks:
 
-- [ ] **2.4.1** Create suggested questions component
+- [x] **2.4.1** Create suggested questions component
 
   - Create `SuggestedQuestions.vue`
   - Implement question button display
   - Add click handling logic
 
-- [ ] **2.4.2** Implement question parsing logic
+- [x] **2.4.2** Implement question parsing logic
   - Extract suggested questions from responses
   - Implement question formatting
   - Add question validation

@@ -37,13 +37,18 @@
       </div>
     </div>
 
+    <!-- Suggested Questions -->
+    <SuggestedQuestions
+      :questions="suggestedQuestions.suggestedQuestions"
+      @question-click="handleSuggestedQuestionClick"
+      class="chat-container__suggestions"
+    />
+
     <!-- Chat Input -->
     <ChatInput
       ref="inputRef"
       :is-loading="isLoading"
-      :suggested-question="currentSuggestedQuestion"
       @send="handleSendMessage"
-      @suggestion-click="handleSuggestionClick"
       class="chat-container__input"
     />
   </div>
@@ -54,9 +59,12 @@ import { ref, computed, nextTick, watch, onMounted } from 'vue'
 import { useChatStore } from '../../stores/chat'
 import MessageBubble from './MessageBubble.vue'
 import ChatInput from './ChatInput.vue'
+import SuggestedQuestions from './SuggestedQuestions.vue'
+import { useSuggestedQuestions } from '../../composables/useSuggestedQuestions'
 import type { Message } from '../../types'
 
 const chatStore = useChatStore()
+const suggestedQuestions = useSuggestedQuestions()
 
 // Refs
 const messagesRef = ref<HTMLElement>()
@@ -66,27 +74,16 @@ const inputRef = ref()
 const messages = computed(() => chatStore.messages)
 const isLoading = computed(() => chatStore.isLoading)
 
-// Current suggested question from last assistant message
-const currentSuggestedQuestion = computed(() => {
-  const lastMessage = chatStore.lastMessage
-  if (lastMessage?.role === 'assistant') {
-    // Extract suggested question from message content
-    const match = lastMessage.content.match(/Suggested Question:\s*(.+?)(?:\n|$)/i)
-    return match ? match[1].trim() : undefined
-  }
-  return undefined
-})
+// Handle suggested question click
+const handleSuggestedQuestionClick = (question: string) => {
+  handleSendMessage(question)
+}
 
 // Methods
 const handleSendMessage = async (message: string) => {
   await chatStore.sendMessage(message)
 }
 
-const handleSuggestionClick = (question: string) => {
-  inputRef.value?.focus()
-  // The input component will handle sending the message
-  handleSendMessage(question)
-}
 
 // Auto-scroll to bottom when new messages arrive
 const scrollToBottom = async () => {
@@ -113,6 +110,32 @@ watch(
       setTimeout(scrollToBottom, 100)
     }
   }
+)
+
+// Watch for new messages to parse suggested questions
+watch(
+  () => messages.value.length,
+  () => {
+    const lastMessage = messages.value[messages.value.length - 1]
+    if (lastMessage && lastMessage.role === 'assistant') {
+      suggestedQuestions.parseSuggestedQuestions(lastMessage.content)
+    }
+  }
+)
+
+// Watch for new assistant messages to update suggestions
+watch(
+  () => messages.value,
+  (newMessages) => {
+    const lastAssistantMessage = [...newMessages]
+      .reverse()
+      .find(msg => msg.role === 'assistant')
+
+    if (lastAssistantMessage) {
+      suggestedQuestions.parseSuggestedQuestions(lastAssistantMessage.content)
+    }
+  },
+  { deep: true }
 )
 
 // Scroll to bottom on mount
@@ -195,6 +218,10 @@ onMounted(() => {
 
 .chat-container__loading-dots span:nth-child(3) {
   animation-delay: 0.4s;
+}
+
+.chat-container__suggestions {
+  flex-shrink: 0;
 }
 
 .chat-container__input {

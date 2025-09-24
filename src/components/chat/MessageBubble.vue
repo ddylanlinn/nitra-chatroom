@@ -4,8 +4,8 @@
       'message-bubble',
       {
         'message-bubble--user': message.role === 'user',
-        'message-bubble--assistant': message.role === 'assistant'
-      }
+        'message-bubble--assistant': message.role === 'assistant',
+      },
     ]"
   >
     <div class="message-bubble__content">
@@ -21,11 +21,7 @@
       </div>
 
       <!-- Static message text for user or when animation is disabled -->
-      <div
-        v-else
-        class="message-bubble__text"
-        v-html="formattedContent"
-      ></div>
+      <div v-else class="message-bubble__text" v-html="formattedContent"></div>
 
       <!-- Timestamp -->
       <div class="message-bubble__timestamp">
@@ -34,10 +30,7 @@
     </div>
 
     <!-- Avatar for assistant messages -->
-    <div
-      v-if="message.role === 'assistant'"
-      class="message-bubble__avatar"
-    >
+    <div v-if="message.role === 'assistant'" class="message-bubble__avatar">
       <q-avatar
         color="primary"
         text-color="white"
@@ -49,95 +42,95 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, onUnmounted } from 'vue'
-import { useTypingAnimation } from '../../composables/useTypingAnimation'
-import type { Message } from '../../types'
+import { computed, onMounted, onUnmounted } from "vue";
+import { useTypingAnimation } from "../../composables/useTypingAnimation";
+import type { Message } from "../../types";
 
 interface Props {
-  message: Message
-  enableTypingAnimation?: boolean
+  message: Message;
+  enableTypingAnimation?: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  enableTypingAnimation: true
-})
+  enableTypingAnimation: true,
+});
 
 // Typing animation setup
 const shouldUseTypingAnimation = computed(() => {
-  return props.message.role === 'assistant' && props.enableTypingAnimation
-})
+  return props.message.role === "assistant" && props.enableTypingAnimation;
+});
 
-const typing = useTypingAnimation(
-  props.message.content,
-  {
-    speed: 30, // 30ms per character for smooth typing
-    delay: 300 // 300ms delay before starting
-  }
-)
+const typing = useTypingAnimation(props.message.content, {
+  speed: 30, // 30ms per character for smooth typing
+  delay: 300, // 300ms delay before starting
+});
 
 // Format markdown content
 const formatMarkdown = (content: string) => {
-  let formatted = content
+  let formatted = content;
 
   // Convert **bold** to <strong>
-  formatted = formatted.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+  formatted = formatted.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>");
 
   // Convert [text](url) to <a>
-  formatted = formatted.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>')
+  formatted = formatted.replace(
+    /\[([^\]]+)\]\(([^)]+)\)/g,
+    '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>'
+  );
 
   // Convert line breaks to <br>
-  formatted = formatted.replace(/\n/g, '<br>')
+  formatted = formatted.replace(/\n/g, "<br>");
 
-  return formatted
-}
+  return formatted;
+};
 
 // Format typing content with markdown support
 const formattedTypingContent = computed(() => {
-  return formatMarkdown(typing.displayedText.value)
-})
+  return formatMarkdown(typing.displayedText.value);
+});
 
 // Format message content with basic markdown support
 const formattedContent = computed(() => {
-  return formatMarkdown(props.message.content)
-})
+  return formatMarkdown(props.message.content);
+});
 
 // Animation control
 const startAnimation = () => {
   if (shouldUseTypingAnimation.value) {
-    typing.startTyping()
+    typing.startTyping();
   }
-}
+};
 
 const skipAnimation = () => {
   if (shouldUseTypingAnimation.value && !typing.isCompleted.value) {
-    typing.skipTyping()
+    typing.skipTyping();
   }
-}
+};
 
 // Lifecycle
 onMounted(() => {
-  startAnimation()
-})
+  startAnimation();
+});
 
 onUnmounted(() => {
-  typing.cleanup()
-})
+  typing.cleanup();
+});
 
 // Format timestamp for display
 const formatTimestamp = (timestamp: string) => {
-  const date = new Date(timestamp)
-  const now = new Date()
-  const diffMs = now.getTime() - date.getTime()
-  const diffHours = diffMs / (1000 * 60 * 60)
+  const date = new Date(timestamp);
+  const now = new Date();
+  const diffMs = now.getTime() - date.getTime();
+  const diffHours = diffMs / (1000 * 60 * 60);
 
   if (diffHours < 24) {
     // Show time only if within 24 hours
-    return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+    return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
   } else {
     // Show date if older
-    return date.toLocaleDateString([], { month: 'short', day: 'numeric' })
+    return date.toLocaleDateString([], { month: "short", day: "numeric" });
   }
-}
+};
 </script>
 
 <style scoped>
@@ -214,8 +207,14 @@ const formatTimestamp = (timestamp: string) => {
 }
 
 @keyframes blink {
-  0%, 50% { opacity: 1; }
-  51%, 100% { opacity: 0; }
+  0%,
+  50% {
+    opacity: 1;
+  }
+  51%,
+  100% {
+    opacity: 0;
+  }
 }
 
 .message-bubble__timestamp {

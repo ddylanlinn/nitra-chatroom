@@ -25,10 +25,10 @@ function parseResponse(content: string, timestamp: string): ParsedMessage {
   let suggestedQuestion: string | undefined
 
   // Extract suggested question (usually at the end)
-  const suggestedMatch = content.match(/Suggested Question: (.+)$/m)
+  const suggestedMatch = content.match(/Suggested Question:\s*(.+?)(?:\n|$)/i)
   if (suggestedMatch) {
-    suggestedQuestion = suggestedMatch[1]
-    content = content.replace(/Suggested Question: .+$/m, '').trim()
+    suggestedQuestion = suggestedMatch[1].trim()
+    content = content.replace(/Suggested Question: .+$/im, '').trim()
   }
 
   // Parse products from the content
