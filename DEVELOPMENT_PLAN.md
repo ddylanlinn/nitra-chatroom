@@ -95,19 +95,19 @@ Build an AI chatroom interface for smart procurement that helps customers find a
 
 #### Tasks:
 
-- [ ] **2.1.1** Create TypeScript interfaces
+- [x] **2.1.1** Create TypeScript interfaces
 
   - Define `ChatResponse` interface
   - Define `MockData` type
   - Define `Message` interface
 
-- [ ] **2.1.2** Setup Pinia Store
+- [x] **2.1.2** Setup Pinia Store
 
   - Create `useChatStore`
   - Implement message state management
   - Implement message history
 
-- [ ] **2.1.3** Implement mock data parser
+- [x] **2.1.3** Implement mock data parser
   - Create `parseMockData` function
   - Implement question matching logic
   - Add error handling
