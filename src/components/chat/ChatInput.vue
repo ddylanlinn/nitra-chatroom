@@ -5,14 +5,16 @@
         <q-input
           v-model="message"
           ref="inputRef"
-          :placeholder="placeholder"
+          :placeholder="isLoading ? 'AI is responding...' : placeholder"
           :loading="isLoading"
           :disable="isLoading"
+          :readonly="isLoading"
           outlined
           autogrow
           :maxlength="maxLength"
           class="chat-input__field"
           @keydown="handleKeydown"
+          @input="handleInput"
         >
           <template v-slot:prepend>
             <q-icon name="chat" color="primary" />
@@ -27,13 +29,14 @@
               round
               type="submit"
               class="chat-input__send-btn"
+              @click="handleSubmit"
             >
               <q-tooltip
-                :disable="!isValid"
+                :disable="!isValid || isLoading"
                 anchor="top middle"
                 self="bottom middle"
               >
-                Send message (Enter)
+                {{ isLoading ? "AI is responding..." : "Send message (Enter)" }}
               </q-tooltip>
             </q-btn>
           </template>
@@ -50,7 +53,7 @@
     </q-form>
 
     <!-- Suggested questions (if provided) -->
-    <div v-if="suggestedQuestion" class="chat-input__suggestions">
+    <div v-if="suggestedQuestion && !isLoading" class="chat-input__suggestions">
       <q-chip
         :label="suggestedQuestion"
         color="primary"
@@ -67,78 +70,100 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, nextTick } from 'vue'
+import { ref, computed, nextTick } from "vue";
 
 interface Props {
-  placeholder?: string
-  maxLength?: number
-  showCharCount?: boolean
-  suggestedQuestion?: string
-  isLoading?: boolean
+  placeholder?: string;
+  maxLength?: number;
+  showCharCount?: boolean;
+  suggestedQuestion?: string;
+  isLoading?: boolean;
 }
 
 interface Emits {
-  (e: 'send', message: string): void
-  (e: 'suggestion-click', question: string): void
+  (e: "send", message: string): void;
+  (e: "suggestion-click", question: string): void;
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  placeholder: 'Type your message...',
+  placeholder: "Type your message...",
   maxLength: 1000,
   showCharCount: false,
   suggestedQuestion: undefined,
-  isLoading: false
-})
+  isLoading: false,
+});
 
-const emit = defineEmits<Emits>()
+const emit = defineEmits<Emits>();
 
-const message = ref('')
-const inputRef = ref()
+const message = ref("");
+const inputRef = ref();
 
 const isValid = computed(() => {
-  const trimmed = message.value.trim()
-  return trimmed.length > 0 && trimmed.length <= props.maxLength
-})
+  const trimmed = message.value.trim();
+  return trimmed.length > 0 && trimmed.length <= props.maxLength;
+});
 
 const sendIcon = computed(() => {
-  if (props.isLoading) return 'hourglass_empty'
-  return 'send'
-})
+  if (props.isLoading) return "hourglass_empty";
+  return "send";
+});
 
 const handleSubmit = () => {
-  if (!isValid.value || props.isLoading) return
+  if (!isValid.value || props.isLoading) return;
 
-  const trimmedMessage = message.value.trim()
-  emit('send', trimmedMessage)
-  message.value = ''
+  const trimmedMessage = message.value.trim();
+  emit("send", trimmedMessage);
+  message.value = "";
 
   // Focus back to input after sending
   nextTick(() => {
-    inputRef.value?.focus()
-  })
-}
+    inputRef.value?.focus();
+  });
+};
 
 const handleKeydown = (event: KeyboardEvent) => {
-  if (event.key === 'Enter' && !event.shiftKey) {
-    event.preventDefault()
-    handleSubmit()
+  // Block all input when loading
+  if (props.isLoading) {
+    event.preventDefault();
+    return;
   }
-}
+
+  if (event.key === "Enter" && !event.shiftKey) {
+    event.preventDefault();
+    if (isValid.value) {
+      handleSubmit();
+    }
+  }
+};
+
+const handleInput = () => {
+  // Block input changes when loading
+  if (props.isLoading) {
+    // Revert the input value
+    nextTick(() => {
+      // Find the previous valid value
+      const trimmed = message.value.trim();
+      if (trimmed.length === 0) {
+        message.value = "";
+      }
+    });
+  }
+};
 
 const handleSuggestionClick = () => {
   if (props.suggestedQuestion) {
-    emit('suggestion-click', props.suggestedQuestion)
+    emit("suggestion-click", props.suggestedQuestion);
   }
-}
+};
 
 // Expose focus method for parent components
 const focus = () => {
-  inputRef.value?.focus()
-}
+  inputRef.value?.focus();
+};
 
 defineExpose({
-  focus
-})
+  focus,
+});
 </script>
 
 <style scoped>
@@ -156,6 +181,11 @@ defineExpose({
   border-radius: 24px;
 }
 
+.chat-input__field[disabled] {
+  pointer-events: none;
+  opacity: 0.6;
+}
+
 .chat-input__field :deep(.q-field__control) {
   border-radius: 24px;
   padding: 0 8px;
@@ -170,6 +200,10 @@ defineExpose({
 
 .chat-input__send-btn {
   margin-right: 8px;
+  cursor: pointer;
+  pointer-events: auto;
+  z-index: 1;
+  position: relative;
 }
 
 .chat-input__char-count {
@@ -316,7 +350,7 @@ defineExpose({
     background: rgba(255, 255, 255, 0.9) !important;
     color: #666666 !important;
   }
-  
+
   .chat-input__field :deep(.q-field__control) {
     background: #ffffff !important;
     color: #333333 !important;

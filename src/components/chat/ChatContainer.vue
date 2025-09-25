@@ -71,6 +71,7 @@
 
     <!-- Suggested Questions -->
     <SuggestedQuestions
+      v-if="!isLoading"
       :questions="suggestedQuestions.suggestedQuestions"
       @question-click="handleSuggestedQuestionClick"
       class="chat-container__suggestions"

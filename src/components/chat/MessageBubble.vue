@@ -8,6 +8,16 @@
       },
     ]"
   >
+    <!-- Avatar for assistant messages (on the left) -->
+    <div v-if="message.role === 'assistant'" class="message-bubble__avatar">
+      <q-avatar
+        color="secondary"
+        text-color="white"
+        size="32px"
+        icon="smart_toy"
+      />
+    </div>
+
     <div class="message-bubble__content">
       <!-- Message text with typing animation for assistant -->
       <div
@@ -27,16 +37,6 @@
       <div class="message-bubble__timestamp">
         {{ formatTimestamp(message.timestamp) }}
       </div>
-    </div>
-
-    <!-- Avatar for assistant messages -->
-    <div v-if="message.role === 'assistant'" class="message-bubble__avatar">
-      <q-avatar
-        color="secondary"
-        text-color="white"
-        size="32px"
-        icon="smart_toy"
-      />
     </div>
   </div>
 </template>
@@ -231,6 +231,7 @@ const formatTimestamp = (timestamp: string) => {
 .message-bubble__avatar {
   margin-right: 8px;
   flex-shrink: 0;
+  align-self: flex-start;
 }
 
 /* Responsive Design */
