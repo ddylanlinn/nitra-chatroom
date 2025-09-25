@@ -1,5 +1,29 @@
 <template>
   <div class="chat-container">
+    <!-- Header Section -->
+    <div class="chat-container__header">
+      <div class="chat-container__header-content">
+        <div class="chat-container__brand">
+          <q-icon name="smart_toy" class="chat-container__brand-icon" />
+          <span class="chat-container__brand-text">Nitra AI</span>
+          <q-icon name="edit" class="chat-container__edit-icon" />
+        </div>
+
+        <div class="chat-container__actions">
+          <q-btn
+            flat
+            round
+            icon="close"
+            color="white"
+            class="chat-container__close-btn"
+            @click="handleClose"
+          />
+        </div>
+      </div>
+
+      <div class="chat-container__subtitle">Hi there, How can we help?</div>
+    </div>
+
     <!-- Chat Messages Area -->
     <div ref="messagesRef" class="chat-container__messages">
       <div v-if="messages.length === 0" class="chat-container__empty">
@@ -87,6 +111,11 @@ const handleSuggestedQuestionClick = (question: string) => {
   handleSendMessage(question);
 };
 
+// Handle close button click
+const handleClose = () => {
+  console.log("Close clicked");
+};
+
 // Methods
 const handleSendMessage = async (message: string) => {
   await chatStore.sendMessage(message);
@@ -153,10 +182,73 @@ onMounted(() => {
 
 <style scoped>
 .chat-container {
+  width: 100%;
+  max-width: 90vw;
   height: 100vh;
   display: flex;
   flex-direction: column;
   background: #ffffff;
+  border-radius: 0;
+  box-shadow: none;
+  overflow: hidden;
+}
+
+.chat-container__header {
+  background: linear-gradient(135deg, #2d5a5a 0%, #1e4040 100%);
+  color: white;
+  padding: 16px 20px 12px;
+  flex-shrink: 0;
+}
+
+.chat-container__header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.chat-container__brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.chat-container__brand-icon {
+  font-size: 24px;
+  color: white;
+}
+
+.chat-container__brand-text {
+  font-size: 18px;
+  font-weight: 600;
+  color: white;
+}
+
+.chat-container__edit-icon {
+  font-size: 16px;
+  color: rgba(255, 255, 255, 0.8);
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.chat-container__edit-icon:hover {
+  color: white;
+}
+
+.chat-container__actions {
+  display: flex;
+  align-items: center;
+}
+
+.chat-container__close-btn {
+  width: 32px;
+  height: 32px;
+}
+
+.chat-container__subtitle {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.9);
+  margin-top: 4px;
 }
 
 .chat-container__messages {
@@ -264,12 +356,38 @@ onMounted(() => {
 /* Large Desktop (1440px+) */
 @media (min-width: 1440px) {
   .chat-container {
-    max-width: 1200px;
-    margin: 0 auto;
+    max-width: 85vw;
+    width: 85vw;
+    height: 100vh;
+  }
+
+  .chat-container__header {
+    padding: 20px 32px 16px;
   }
 
   .chat-container__messages {
-    padding: 24px 48px;
+    padding: 24px 32px;
+  }
+
+  .chat-container__welcome {
+    max-width: 600px;
+  }
+}
+
+/* Desktop (1024px - 1439px) */
+@media (min-width: 1024px) and (max-width: 1439px) {
+  .chat-container {
+    max-width: 88vw;
+    width: 88vw;
+    height: 100vh;
+  }
+
+  .chat-container__header {
+    padding: 18px 24px 14px;
+  }
+
+  .chat-container__messages {
+    padding: 20px 24px;
   }
 
   .chat-container__welcome {
@@ -277,21 +395,20 @@ onMounted(() => {
   }
 }
 
-/* Desktop (1024px - 1439px) */
-@media (min-width: 1024px) and (max-width: 1439px) {
-  .chat-container__messages {
-    padding: 20px 32px;
-  }
-
-  .chat-container__welcome {
-    max-width: 450px;
-  }
-}
-
 /* Tablet (768px - 1023px) */
 @media (min-width: 768px) and (max-width: 1023px) {
+  .chat-container {
+    max-width: 100%;
+    width: 100%;
+    height: 100vh;
+  }
+
+  .chat-container__header {
+    padding: 16px 18px 12px;
+  }
+
   .chat-container__messages {
-    padding: 16px 24px;
+    padding: 16px;
   }
 
   .chat-container__welcome {
@@ -305,8 +422,18 @@ onMounted(() => {
 
 /* Mobile Large (480px - 767px) */
 @media (min-width: 480px) and (max-width: 767px) {
+  .chat-container {
+    max-width: 100%;
+    width: 100%;
+    height: 100vh;
+  }
+
+  .chat-container__header {
+    padding: 14px 16px 10px;
+  }
+
   .chat-container__messages {
-    padding: 14px 20px;
+    padding: 14px;
   }
 
   .chat-container__welcome {
@@ -326,8 +453,16 @@ onMounted(() => {
 /* Mobile Small (up to 479px) */
 @media (max-width: 479px) {
   .chat-container {
+    width: 100%;
+    max-width: 100%;
     height: 100vh;
     height: 100dvh; /* Dynamic viewport height for mobile browsers */
+    border-radius: 0;
+    box-shadow: none;
+  }
+
+  .chat-container__header {
+    padding: 12px 16px 8px;
   }
 
   .chat-container__messages {

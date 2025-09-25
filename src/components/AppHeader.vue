@@ -39,6 +39,24 @@ const handleClose = () => {
   padding: 16px 20px 12px;
   position: relative;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  max-width: 100%;
+}
+
+/* Desktop: Constrain header width to match chat container */
+@media (min-width: 1024px) {
+  .app-header {
+    max-width: 1200px;
+    margin: 0 auto;
+    border-radius: 0 0 12px 12px;
+  }
+}
+
+/* Large Desktop: Match chat container width exactly */
+@media (min-width: 1440px) {
+  .app-header {
+    max-width: 1200px;
+    margin: 0 auto;
+  }
 }
 
 .app-header__content {
@@ -93,6 +111,15 @@ const handleClose = () => {
 }
 
 /* Responsive Design */
+/* Tablet and Mobile: Keep full width */
+@media (max-width: 1023px) {
+  .app-header {
+    max-width: 100%;
+    margin: 0;
+    border-radius: 0;
+  }
+}
+
 /* Mobile Small (up to 479px) */
 @media (max-width: 479px) {
   .app-header {
