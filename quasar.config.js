@@ -39,6 +39,9 @@ export default defineConfig((/* ctx */) => {
 
       vueRouterMode: "hash", // available values: 'hash', 'history' - hash for GitHub Pages
       // vueRouterBase,
+
+      // Set publicPath for GitHub Pages deployment
+      publicPath: process.env.NODE_ENV === 'production' ? '/nitra-chatroom/' : '/',
       // vueDevtools,
       // vueOptionsAPI: false,
 
