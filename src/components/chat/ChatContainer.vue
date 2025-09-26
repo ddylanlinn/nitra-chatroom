@@ -4,7 +4,7 @@
     <div class="chat-container__header">
       <div class="chat-container__header-content">
         <div class="chat-container__brand">
-          <img src="/icons/Emblems.png" alt="Nitra AI" class="chat-container__brand-icon" />
+          <img src="icons/Emblems.png" alt="Nitra AI" class="chat-container__brand-icon" />
           <span class="chat-container__brand-text">Nitra AI</span>
         </div>
 
@@ -28,7 +28,7 @@
       <div v-if="messages.length === 0" class="chat-container__empty">
         <div class="chat-container__welcome">
           <div class="chat-container__welcome-icon-wrapper">
-            <img src="/icons/Emblems.png" alt="Nitra AI" class="chat-container__welcome-icon" />
+            <img src="icons/Emblems.png" alt="Nitra AI" class="chat-container__welcome-icon" />
           </div>
           <h6 class="q-ma-none q-mt-md">Welcome to Nitra AI!</h6>
           <p class="text-grey-7 q-mt-none text-center">

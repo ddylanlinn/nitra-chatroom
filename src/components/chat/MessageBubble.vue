@@ -10,7 +10,7 @@
   >
     <div v-if="message.role === 'assistant'" class="message-bubble__avatar">
       <div class="message-bubble__avatar-wrapper">
-        <img src="/icons/Emblems.png" alt="Assistant" class="message-bubble__avatar-icon" />
+        <img src="icons/Emblems.png" alt="Assistant" class="message-bubble__avatar-icon" />
       </div>
     </div>
 
