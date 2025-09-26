@@ -8,20 +8,29 @@
       },
     ]"
   >
-    <!-- Avatar for assistant messages (on the left) -->
     <div v-if="message.role === 'assistant'" class="message-bubble__avatar">
-      <q-avatar
-        color="secondary"
-        text-color="white"
-        size="32px"
-        icon="smart_toy"
-      />
+      <div class="message-bubble__avatar-wrapper">
+        <img src="/icons/Emblems.png" alt="Assistant" class="message-bubble__avatar-icon" />
+      </div>
     </div>
 
     <div class="message-bubble__content">
+      <!-- Thinking animation -->
+      <div
+        v-if="isThinking"
+        class="message-bubble__text message-bubble__thinking"
+      >
+        <span class="message-bubble__thinking-text">Thinking</span>
+        <div class="message-bubble__thinking-dots">
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
+      </div>
+
       <!-- Message text with typing animation for assistant -->
       <div
-        v-if="message.role === 'assistant' && shouldUseTypingAnimation"
+        v-else-if="message.role === 'assistant' && shouldUseTypingAnimation"
         class="message-bubble__text"
         @click="skipAnimation"
         :class="{ 'message-bubble__text--clickable': !typing.isCompleted }"
@@ -30,11 +39,11 @@
         <span v-if="!typing.isCompleted" class="message-bubble__cursor">|</span>
       </div>
 
-      <!-- Static message text for user or when animation is disabled -->
+      <!-- Static message-->
       <div v-else class="message-bubble__text" v-html="formattedContent"></div>
 
       <!-- Timestamp -->
-      <div class="message-bubble__timestamp">
+      <div v-if="!isThinking" class="message-bubble__timestamp">
         {{ formatTimestamp(message.timestamp) }}
       </div>
     </div>
@@ -42,20 +51,21 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, onUnmounted } from "vue";
+import { computed, onMounted, onUnmounted, watch } from "vue";
 import { useTypingAnimation } from "../../composables/useTypingAnimation";
 import type { Message } from "../../types";
 
 interface Props {
   message: Message;
   enableTypingAnimation?: boolean;
+  isThinking?: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
   enableTypingAnimation: true,
+  isThinking: false,
 });
 
-// Typing animation setup
 const shouldUseTypingAnimation = computed(() => {
   return props.message.role === "assistant" && props.enableTypingAnimation;
 });
@@ -65,17 +75,44 @@ const typing = useTypingAnimation(props.message.content, {
   delay: 300, // 300ms delay before starting
 });
 
-// Format markdown content
+// Emit events for typing animation
+const emit = defineEmits<{
+  typingProgress: [];
+  typingComplete: [];
+}>();
+
+// Watch typing progress and emit events
+watch(
+  () => typing.displayedText.value,
+  () => {
+    if (shouldUseTypingAnimation.value) {
+      emit("typingProgress");
+    }
+  }
+);
+
+watch(
+  () => typing.isCompleted.value,
+  (isCompleted) => {
+    if (isCompleted && shouldUseTypingAnimation.value) {
+      emit("typingComplete");
+    }
+  }
+);
+
 const formatMarkdown = (content: string) => {
   let formatted = content;
 
   // Convert **bold** to <strong>
   formatted = formatted.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>");
 
-  // Convert [text](url) to <a>
+  // Convert [text](url) to <a>, with special styling for Product Link
   formatted = formatted.replace(
     /\[([^\]]+)\]\(([^)]+)\)/g,
-    '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>'
+    (match, text, url) => {
+      const linkClass = text === 'Product Link' ? 'message-bubble__product-link' : '';
+      return `<a href="${url}" target="_blank" rel="noopener noreferrer" class="${linkClass}">${text}</a>`;
+    }
   );
 
   // Convert line breaks to <br>
@@ -84,17 +121,14 @@ const formatMarkdown = (content: string) => {
   return formatted;
 };
 
-// Format typing content with markdown support
 const formattedTypingContent = computed(() => {
   return formatMarkdown(typing.displayedText.value);
 });
 
-// Format message content with basic markdown support
 const formattedContent = computed(() => {
   return formatMarkdown(props.message.content);
 });
 
-// Animation control
 const startAnimation = () => {
   if (shouldUseTypingAnimation.value) {
     typing.startTyping();
@@ -107,7 +141,6 @@ const skipAnimation = () => {
   }
 };
 
-// Lifecycle
 onMounted(() => {
   startAnimation();
 });
@@ -116,7 +149,6 @@ onUnmounted(() => {
   typing.cleanup();
 });
 
-// Format timestamp for display
 const formatTimestamp = (timestamp: string) => {
   const date = new Date(timestamp);
   const now = new Date();
@@ -133,7 +165,8 @@ const formatTimestamp = (timestamp: string) => {
 };
 </script>
 
-<style scoped>
+<style scoped lang="scss">
+@import "../../css/app.scss";
 .message-bubble {
   display: flex;
   margin-bottom: 16px;
@@ -163,8 +196,8 @@ const formatTimestamp = (timestamp: string) => {
 
 /* Message bubble styling */
 .message-bubble--user .message-bubble__content {
-  background: var(--q-primary);
-  color: white;
+  background: $teal-100;
+  color: #333;
   border-radius: 18px 18px 4px 18px;
   padding: 12px 16px;
 }
@@ -192,6 +225,15 @@ const formatTimestamp = (timestamp: string) => {
 }
 
 .message-bubble__text :deep(a:hover) {
+  opacity: 0.8;
+}
+
+.message-bubble__text :deep(.message-bubble__product-link) {
+  color: #FB7429;
+}
+
+.message-bubble__text :deep(.message-bubble__product-link:hover) {
+  color: #FB7429;
   opacity: 0.8;
 }
 
@@ -232,6 +274,71 @@ const formatTimestamp = (timestamp: string) => {
   margin-right: 8px;
   flex-shrink: 0;
   align-self: flex-start;
+}
+
+.message-bubble__avatar-wrapper {
+  width: 40px;
+  height: 40px;
+  background: $teal-700;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.message-bubble__avatar-icon {
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+}
+
+/* Thinking animation styles */
+.message-bubble__thinking {
+  display: flex;
+  align-items: flex-end;
+}
+
+.message-bubble__thinking-text {
+  color: $gray-600;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.message-bubble__thinking-dots {
+  display: flex;
+  gap: 2px;
+  margin-left: 4px;
+  align-items: flex-end;
+  padding-bottom: 2px;
+}
+
+.message-bubble__thinking-dots span {
+  width: 2px;
+  height: 2px;
+  background: $gray-500;
+  border-radius: 50%;
+  animation: thinkingDot 1.4s infinite ease-in-out;
+}
+
+.message-bubble__thinking-dots span:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.message-bubble__thinking-dots span:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+@keyframes thinkingDot {
+  0%,
+  80%,
+  100% {
+    transform: scale(0.8);
+    opacity: 0.5;
+  }
+  40% {
+    transform: scale(1);
+    opacity: 1;
+  }
 }
 
 /* Responsive Design */

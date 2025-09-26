@@ -4,9 +4,8 @@
     <div class="chat-container__header">
       <div class="chat-container__header-content">
         <div class="chat-container__brand">
-          <q-icon name="smart_toy" class="chat-container__brand-icon" />
+          <img src="/icons/Emblems.png" alt="Nitra AI" class="chat-container__brand-icon" />
           <span class="chat-container__brand-text">Nitra AI</span>
-          <q-icon name="edit" class="chat-container__edit-icon" />
         </div>
 
         <div class="chat-container__actions">
@@ -28,14 +27,11 @@
     <div ref="messagesRef" class="chat-container__messages">
       <div v-if="messages.length === 0" class="chat-container__empty">
         <div class="chat-container__welcome">
-          <q-avatar
-            size="80px"
-            color="secondary"
-            icon="smart_toy"
-            class="chat-container__avatar"
-          />
-          <h5 class="text-secondary q-mt-md">Welcome to Nitra AI!</h5>
-          <p class="text-grey-7 q-mt-sm text-center">
+          <div class="chat-container__welcome-icon-wrapper">
+            <img src="/icons/Emblems.png" alt="Nitra AI" class="chat-container__welcome-icon" />
+          </div>
+          <h6 class="q-ma-none q-mt-md">Welcome to Nitra AI!</h6>
+          <p class="text-grey-7 q-mt-none text-center">
             Ask me about medical supplies like gloves, ultrasound gel,<br />
             antibiotic ointments, surgical scissors, or masks.
           </p>
@@ -50,32 +46,24 @@
           :message="message"
           :enable-typing-animation="true"
           class="chat-container__message"
+          @typing-progress="scrollToBottom"
+          @typing-complete="scrollToBottom"
         />
 
-        <!-- Loading indicator (only when waiting for response) -->
-        <div
-          v-if="isLoading && messages.length === 0"
-          class="chat-container__loading"
-        >
-          <div class="chat-container__loading-bubble">
-            <q-avatar size="32px" color="primary" icon="smart_toy" />
-            <div class="chat-container__loading-dots">
-              <span></span>
-              <span></span>
-              <span></span>
-            </div>
-          </div>
-        </div>
+        <!-- Thinking Animation -->
+        <MessageBubble
+          v-if="isThinking"
+          :message="{
+            id: 'thinking',
+            role: 'assistant',
+            content: '',
+            timestamp: new Date().toISOString(),
+          }"
+          :is-thinking="true"
+          class="chat-container__message"
+        />
       </div>
     </div>
-
-    <!-- Suggested Questions -->
-    <SuggestedQuestions
-      v-if="!isLoading"
-      :questions="suggestedQuestions.suggestedQuestions"
-      @question-click="handleSuggestedQuestionClick"
-      class="chat-container__suggestions"
-    />
 
     <!-- Chat Input -->
     <ChatInput
@@ -92,37 +80,23 @@ import { ref, computed, nextTick, watch, onMounted } from "vue";
 import { useChatStore } from "../../stores/chat";
 import MessageBubble from "./MessageBubble.vue";
 import ChatInput from "./ChatInput.vue";
-import SuggestedQuestions from "./SuggestedQuestions.vue";
-import { useSuggestedQuestions } from "../../composables/useSuggestedQuestions";
 import type { Message } from "../../types";
 
 const chatStore = useChatStore();
-const suggestedQuestions = useSuggestedQuestions();
 
-// Refs
 const messagesRef = ref<HTMLElement>();
 const inputRef = ref();
 
-// Computed
 const messages = computed(() => chatStore.messages);
 const isLoading = computed(() => chatStore.isLoading);
+const isThinking = computed(() => chatStore.isThinking);
 
-// Handle suggested question click
-const handleSuggestedQuestionClick = (question: string) => {
-  handleSendMessage(question);
-};
+const handleClose = () => console.log("Close clicked");
 
-// Handle close button click
-const handleClose = () => {
-  console.log("Close clicked");
-};
-
-// Methods
 const handleSendMessage = async (message: string) => {
   await chatStore.sendMessage(message);
 };
 
-// Auto-scroll to bottom when new messages arrive
 const scrollToBottom = async () => {
   await nextTick();
   if (messagesRef.value) {
@@ -149,39 +123,15 @@ watch(
   }
 );
 
-// Watch for new messages to parse suggested questions
-watch(
-  () => messages.value.length,
-  () => {
-    const lastMessage = messages.value[messages.value.length - 1];
-    if (lastMessage && lastMessage.role === "assistant") {
-      suggestedQuestions.parseSuggestedQuestions(lastMessage.content);
-    }
-  }
-);
-
-// Watch for new assistant messages to update suggestions
-watch(
-  () => messages.value,
-  (newMessages) => {
-    const lastAssistantMessage = [...newMessages]
-      .reverse()
-      .find((msg) => msg.role === "assistant");
-
-    if (lastAssistantMessage) {
-      suggestedQuestions.parseSuggestedQuestions(lastAssistantMessage.content);
-    }
-  },
-  { deep: true }
-);
-
 // Scroll to bottom on mount
 onMounted(() => {
   scrollToBottom();
 });
 </script>
 
-<style scoped>
+<style scoped lang="scss">
+@import "../../css/app.scss";
+
 .chat-container {
   width: 100%;
   max-width: 90vw;
@@ -215,12 +165,13 @@ onMounted(() => {
 }
 
 .chat-container__brand-icon {
-  font-size: 24px;
-  color: white;
+  width: 30px;
+  height: 30px;
+  object-fit: contain;
 }
 
 .chat-container__brand-text {
-  font-size: 18px;
+  font-size: 28px;
   font-weight: 600;
   color: white;
 }
@@ -271,14 +222,45 @@ onMounted(() => {
   max-width: 400px;
 }
 
-.chat-container__avatar {
+.chat-container__welcome-icon-wrapper {
+  width: 80px;
+  height: 80px;
+  background: $teal-700;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   margin: 0 auto;
+}
+
+.chat-container__welcome-icon {
+  width: 50px;
+  height: 50px;
+  object-fit: contain;
 }
 
 .chat-container__message-list {
   display: flex;
   flex-direction: column;
   gap: 8px;
+}
+
+/* Thinking Animation */
+.chat-container__thinking {
+  display: flex;
+  justify-content: flex-start;
+  margin: 16px 0;
+}
+
+.chat-container__thinking-content {
+  display: flex;
+  align-items: flex-end;
+  gap: 2px;
+  background: #f5f5f5;
+  border: 1px solid #e0e0e0;
+  border-radius: 18px 18px 18px 4px;
+  padding: 12px;
+  max-width: 200px;
 }
 
 .chat-container__message {
@@ -321,6 +303,7 @@ onMounted(() => {
 }
 
 .chat-container__suggestions {
+  border-top: 1px solid red;
   flex-shrink: 0;
 }
 
@@ -476,7 +459,7 @@ onMounted(() => {
 
   .chat-container__welcome h5 {
     font-size: 1.1rem;
-    margin-bottom: 8px;
+    margin-bottom: 12px;
   }
 
   .chat-container__welcome p {
@@ -488,36 +471,6 @@ onMounted(() => {
     width: 60px !important;
     height: 60px !important;
     font-size: 1.5rem !important;
-  }
-}
-
-/* Force light theme regardless of system preference */
-@media (prefers-color-scheme: dark) {
-  .chat-container {
-    background: #ffffff !important;
-    color: #333333 !important;
-  }
-
-  .chat-container__messages {
-    background: #ffffff !important;
-    color: #333333 !important;
-  }
-
-  .chat-container__welcome h5 {
-    color: var(--q-secondary) !important;
-  }
-
-  .chat-container__welcome p {
-    color: #666666 !important;
-  }
-
-  .chat-container__typing-dots {
-    background: #f5f5f5 !important;
-    border-color: #e0e0e0 !important;
-  }
-
-  .chat-container__typing-dots span {
-    background: #999 !important;
   }
 }
 

@@ -1,108 +1,105 @@
-import { MESSAGE_MOCK_MAP } from '../mock/messages'
-import type { ParsedMessage, ProductInfo } from '../types'
+import { MESSAGE_MOCK_MAP } from "../mock/messages";
+import type { ParsedMessage, ProductInfo } from "../types";
 
 export function parseMockData(userMessage: string): ParsedMessage | null {
-  // Find exact match first
-  const exactMatch = MESSAGE_MOCK_MAP[userMessage]
+  // Exact match
+  const exactMatch = MESSAGE_MOCK_MAP[userMessage];
   if (exactMatch) {
-    return parseResponse(exactMatch.message.content, exactMatch.message.timestamp)
+    return parseResponse(
+      exactMatch.message.content,
+      exactMatch.message.timestamp
+    );
   }
 
-  // Find partial match (case insensitive)
-  const lowerUserMessage = userMessage.toLowerCase()
+  // Partial match
+  const lowerUserMessage = userMessage.toLowerCase();
   for (const [key, response] of Object.entries(MESSAGE_MOCK_MAP)) {
-    const lowerKey = key.toLowerCase()
-    if (lowerUserMessage.includes(lowerKey) || lowerKey.includes(lowerUserMessage)) {
-      return parseResponse(response.message.content, response.message.timestamp)
+    const lowerKey = key.toLowerCase();
+    if (
+      lowerUserMessage.includes(lowerKey) ||
+      lowerKey.includes(lowerUserMessage)
+    ) {
+      return parseResponse(
+        response.message.content,
+        response.message.timestamp
+      );
     }
   }
 
-  return null
+  return null;
 }
 
 function parseResponse(content: string, timestamp: string): ParsedMessage {
-  const products: ProductInfo[] = []
-  let suggestedQuestion: string | undefined
+  const productBlocks = splitProductBlocks(content);
 
-  // Extract suggested question (usually at the end)
-  const suggestedMatch = content.match(/Suggested Question:\s*(.+?)(?:\n|$)/i)
-  if (suggestedMatch) {
-    suggestedQuestion = suggestedMatch[1].trim()
-    content = content.replace(/Suggested Question: .+$/im, '').trim()
-  }
-
-  // Parse products from the content
-  const productBlocks = content.split(/\n\n(?=\d+\.)/)
-
-  productBlocks.forEach((block) => {
-    const product = parseProductBlock(block)
-    if (product) {
-      products.push(product)
-    }
-  })
+  const products = productBlocks
+    .map(parseProductBlock)
+    .filter((p): p is ProductInfo => p !== null);
 
   return {
     message: {
-      role: 'assistant',
-      content,
-      timestamp
+      role: "assistant",
+      content: content.trim(),
+      timestamp,
     },
-    products: products.length > 0 ? products : undefined,
-    suggestedQuestion
-  }
+    products: products.length ? products : undefined,
+  };
+}
+
+function splitProductBlocks(content: string): string[] {
+  return content
+    .split(/\n\n(?=\d+\.)/)
+    .map((b) => b.trim())
+    .filter(Boolean);
 }
 
 function parseProductBlock(block: string): ProductInfo | null {
-  const lines = block.split('\n').map(line => line.trim()).filter(line => line)
+  const lines = block
+    .split("\n")
+    .map((l) => l.trim())
+    .filter(Boolean);
+  if (!lines.length) return null;
 
-  if (lines.length === 0) return null
+  // Product name
+  const nameMatch = lines[0].match(/^\d+\.\s*\*\*(.+?)\*\*/);
+  if (!nameMatch) return null;
+  const name = nameMatch[1];
 
-  // Extract product name (first line, remove numbering)
-  const nameLine = lines[0]
-  const nameMatch = nameLine.match(/^\d+\.\s*\*\*(.+?)\*\*/)
-  if (!nameMatch) return null
+  // Other properties
+  const info: Partial<ProductInfo> = { name };
 
-  const name = nameMatch[1]
+  const propertyMap: Record<string, keyof ProductInfo> = {
+    "- Price:": "price",
+    "- Unit of Measure:": "unitOfMeasure",
+    "- Vendor:": "vendor",
+    "- Brand:": "brand",
+  };
 
-  // Parse other properties
-  let price = ''
-  let unitOfMeasure = ''
-  let vendor = ''
-  let brand = ''
-  let productLink = ''
-  let imageLink = ''
-
-  for (let i = 1; i < lines.length; i++) {
-    const line = lines[i]
-
-    if (line.startsWith('- Price:')) {
-      price = line.replace('- Price:', '').trim()
-    } else if (line.startsWith('- Unit of Measure:')) {
-      unitOfMeasure = line.replace('- Unit of Measure:', '').trim()
-    } else if (line.startsWith('- Vendor:')) {
-      vendor = line.replace('- Vendor:', '').trim()
-    } else if (line.startsWith('- Brand:')) {
-      brand = line.replace('- Brand:', '').trim()
-    } else if (line.startsWith('- [Product Link]')) {
-      const linkMatch = line.match(/\[Product Link\]\((.+?)\)/)
-      if (linkMatch) {
-        productLink = linkMatch[1]
+  for (const line of lines.slice(1)) {
+    for (const [prefix, key] of Object.entries(propertyMap)) {
+      if (line.startsWith(prefix)) {
+        info[key] = line.replace(prefix, "").trim();
       }
-    } else if (line.startsWith('- [Image Link]')) {
-      const linkMatch = line.match(/\[Image Link\]\((.+?)\)/)
-      if (linkMatch) {
-        imageLink = linkMatch[1]
-      }
+    }
+
+    if (line.startsWith("- [Product Link]")) {
+      const match = line.match(/\[Product Link\]\((.+?)\)/);
+      if (match) info.productLink = match[1];
+    }
+
+    if (line.startsWith("- [Image Link]")) {
+      const match = line.match(/\[Image Link\]\((.+?)\)/);
+      if (match) info.imageLink = match[1];
     }
   }
 
   return {
     name,
-    price,
-    unitOfMeasure: unitOfMeasure || undefined,
-    vendor,
-    brand: brand || undefined,
-    productLink: productLink || undefined,
-    imageLink: imageLink || undefined
-  }
+    price: info.price ?? "",
+    unitOfMeasure: info.unitOfMeasure || undefined,
+    vendor: info.vendor || undefined,
+    brand: info.brand || undefined,
+    productLink: info.productLink,
+    imageLink: info.imageLink,
+  };
 }

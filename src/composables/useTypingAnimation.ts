@@ -1,20 +1,26 @@
-import { ref, computed } from 'vue'
-import type { TypingConfig, TypingState } from '../types'
+import { ref, computed, onUnmounted } from 'vue'
+import type { TypingConfig } from '../types'
+
+enum TypingStatus {
+  IDLE = 'idle',
+  DELAYING = 'delaying',
+  TYPING = 'typing',
+  PAUSED = 'paused',
+  COMPLETED = 'completed'
+}
 
 export function useTypingAnimation(
   fullText: string,
   config: TypingConfig = {}
 ) {
-  // Configuration with defaults
   const {
-    speed = 50, // milliseconds per character
-    delay = 200, // delay before starting animation
+    speed = 50,
+    delay = 200,
   } = config
 
   // State
   const currentIndex = ref(0)
-  const isTyping = ref(false)
-  const isCompleted = ref(false)
+  const status = ref(TypingStatus.IDLE)
   const startTime = ref<number | null>(null)
 
   // Computed
@@ -23,41 +29,59 @@ export function useTypingAnimation(
   })
 
   const progress = computed(() => {
-    if (fullText.length === 0) return 1
+    if (!fullText || fullText.length === 0) return 1
     return currentIndex.value / fullText.length
   })
 
   const remainingTime = computed(() => {
-    if (!isTyping.value || isCompleted.value) return 0
+    if (status.value !== TypingStatus.TYPING) return 0
     const remainingChars = fullText.length - currentIndex.value
     return remainingChars * speed
   })
 
-  // State object for external access
-  const state = computed<TypingState>(() => ({
-    isTyping: isTyping.value,
-    currentIndex: currentIndex.value,
-    fullText,
-    displayedText: displayedText.value
-  }))
+  const isTyping = computed(() => status.value === TypingStatus.TYPING)
+  const isCompleted = computed(() => status.value === TypingStatus.COMPLETED)
+  const isPaused = computed(() => status.value === TypingStatus.PAUSED)
 
-  // Animation logic
+  // Animation handles
   let animationId: number | null = null
   let delayTimeout: number | null = null
+  let lastFrameTime = 0
+
+  const cleanup = () => {
+    if (animationId) {
+      cancelAnimationFrame(animationId)
+      animationId = null
+    }
+    if (delayTimeout) {
+      clearTimeout(delayTimeout)
+      delayTimeout = null
+    }
+  }
 
   const startTyping = () => {
-    if (isTyping.value || isCompleted.value) return
+    if (status.value === TypingStatus.TYPING || status.value === TypingStatus.COMPLETED) {
+      return
+    }
+
+    // Edge case: empty text
+    if (!fullText || fullText.length === 0) {
+      status.value = TypingStatus.COMPLETED
+      return
+    }
 
     // Reset state
     currentIndex.value = 0
-    isCompleted.value = false
+    status.value = TypingStatus.DELAYING
     startTime.value = Date.now()
 
-    // Start with delay if specified
+    // Handle delay
     if (delay > 0) {
       delayTimeout = window.setTimeout(() => {
         delayTimeout = null
-        beginTyping()
+        if (status.value === TypingStatus.DELAYING) {
+          beginTyping()
+        }
       }, delay)
     } else {
       beginTyping()
@@ -65,41 +89,56 @@ export function useTypingAnimation(
   }
 
   const beginTyping = () => {
-    isTyping.value = true
-
-    const typeNextChar = () => {
-      if (currentIndex.value < fullText.length) {
-        currentIndex.value++
-        animationId = window.setTimeout(typeNextChar, speed)
-      } else {
-        completeTyping()
-      }
+    if (currentIndex.value >= fullText.length) {
+      completeTyping()
+      return
     }
 
+    status.value = TypingStatus.TYPING
+    lastFrameTime = performance.now()
     typeNextChar()
   }
 
-  const completeTyping = () => {
-    currentIndex.value = fullText.length
-    isTyping.value = false
-    isCompleted.value = true
+  const typeNextChar = () => {
+    const animate = (currentTime: number) => {
+      if (status.value !== TypingStatus.TYPING) {
+        animationId = null
+        return
+      }
 
-    if (animationId) {
-      clearTimeout(animationId)
-      animationId = null
+      if (currentTime - lastFrameTime >= speed) {
+        if (currentIndex.value < fullText.length) {
+          currentIndex.value++
+          lastFrameTime = currentTime
+        }
+
+        if (currentIndex.value >= fullText.length) {
+          completeTyping()
+          return
+        }
+      }
+
+      animationId = requestAnimationFrame(animate)
     }
+
+    animationId = requestAnimationFrame(animate)
+  }
+
+  const completeTyping = () => {
+    cleanup()
+    currentIndex.value = fullText.length
+    status.value = TypingStatus.COMPLETED
   }
 
   const pauseTyping = () => {
-    if (animationId) {
-      clearTimeout(animationId)
-      animationId = null
+    if (status.value === TypingStatus.TYPING) {
+      cleanup()
+      status.value = TypingStatus.PAUSED
     }
-    isTyping.value = false
   }
 
   const resumeTyping = () => {
-    if (!isTyping.value && !isCompleted.value && currentIndex.value < fullText.length) {
+    if (status.value === TypingStatus.PAUSED && currentIndex.value < fullText.length) {
       beginTyping()
     }
   }
@@ -109,40 +148,27 @@ export function useTypingAnimation(
   }
 
   const resetTyping = () => {
-    // Clear all timers
-    if (animationId) {
-      clearTimeout(animationId)
-      animationId = null
-    }
-    if (delayTimeout) {
-      clearTimeout(delayTimeout)
-      delayTimeout = null
-    }
-
-    // Reset state
+    cleanup()
     currentIndex.value = 0
-    isTyping.value = false
-    isCompleted.value = false
+    status.value = TypingStatus.IDLE
     startTime.value = null
   }
 
-  // Cleanup on unmount
-  const cleanup = () => {
-    resetTyping()
-  }
+  // Auto cleanup on unmount
+  onUnmounted(() => {
+    cleanup()
+  })
 
   return {
     // State
-    state,
-
-    // Computed
     displayedText,
     progress,
     remainingTime,
-    isTyping: computed(() => isTyping.value),
-    isCompleted: computed(() => isCompleted.value),
-
-    // Methods
+    isTyping,
+    isCompleted,
+    isPaused,
+    
+    // Actions
     startTyping,
     pauseTyping,
     resumeTyping,

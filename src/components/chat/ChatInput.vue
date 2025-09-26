@@ -6,7 +6,6 @@
           v-model="message"
           ref="inputRef"
           :placeholder="isLoading ? 'AI is responding...' : placeholder"
-          :loading="isLoading"
           :disable="isLoading"
           :readonly="isLoading"
           outlined
@@ -16,10 +15,6 @@
           @keydown="handleKeydown"
           @input="handleInput"
         >
-          <template v-slot:prepend>
-            <q-icon name="chat" color="primary" />
-          </template>
-
           <template v-slot:append>
             <q-btn
               :icon="sendIcon"
@@ -31,41 +26,11 @@
               class="chat-input__send-btn"
               @click="handleSubmit"
             >
-              <q-tooltip
-                :disable="!isValid || isLoading"
-                anchor="top middle"
-                self="bottom middle"
-              >
-                {{ isLoading ? "AI is responding..." : "Send message (Enter)" }}
-              </q-tooltip>
             </q-btn>
           </template>
         </q-input>
-
-        <!-- Character count (optional) -->
-        <div
-          v-if="showCharCount && message.length > maxLength * 0.8"
-          class="chat-input__char-count"
-        >
-          {{ message.length }}/{{ maxLength }}
-        </div>
       </div>
     </q-form>
-
-    <!-- Suggested questions (if provided) -->
-    <div v-if="suggestedQuestion && !isLoading" class="chat-input__suggestions">
-      <q-chip
-        :label="suggestedQuestion"
-        color="primary"
-        outline
-        clickable
-        @click="handleSuggestionClick"
-        class="chat-input__suggestion-chip"
-      >
-        <q-icon name="lightbulb" />
-        <q-tooltip>Suggested question</q-tooltip>
-      </q-chip>
-    </div>
   </div>
 </template>
 
@@ -76,20 +41,17 @@ interface Props {
   placeholder?: string;
   maxLength?: number;
   showCharCount?: boolean;
-  suggestedQuestion?: string;
   isLoading?: boolean;
 }
 
 interface Emits {
   (e: "send", message: string): void;
-  (e: "suggestion-click", question: string): void;
 }
 
 const props = withDefaults(defineProps<Props>(), {
   placeholder: "Type your message...",
   maxLength: 1000,
   showCharCount: false,
-  suggestedQuestion: undefined,
   isLoading: false,
 });
 
@@ -115,16 +77,19 @@ const handleSubmit = () => {
   emit("send", trimmedMessage);
   message.value = "";
 
-  // Focus back to input after sending
   nextTick(() => {
     inputRef.value?.focus();
   });
 };
 
 const handleKeydown = (event: KeyboardEvent) => {
-  // Block all input when loading
   if (props.isLoading) {
     event.preventDefault();
+    return;
+  }
+
+  // Don't interfere with composition events (for Chinese, Japanese, Korean input)
+  if (event.isComposing) {
     return;
   }
 
@@ -137,11 +102,8 @@ const handleKeydown = (event: KeyboardEvent) => {
 };
 
 const handleInput = () => {
-  // Block input changes when loading
   if (props.isLoading) {
-    // Revert the input value
     nextTick(() => {
-      // Find the previous valid value
       const trimmed = message.value.trim();
       if (trimmed.length === 0) {
         message.value = "";
@@ -150,13 +112,6 @@ const handleInput = () => {
   }
 };
 
-const handleSuggestionClick = () => {
-  if (props.suggestedQuestion) {
-    emit("suggestion-click", props.suggestedQuestion);
-  }
-};
-
-// Expose focus method for parent components
 const focus = () => {
   inputRef.value?.focus();
 };
@@ -166,7 +121,9 @@ defineExpose({
 });
 </script>
 
-<style scoped>
+<style scoped lang="scss">
+@import "../../css/app.scss";
+
 .chat-input {
   padding: 16px;
   background: white;
@@ -193,7 +150,7 @@ defineExpose({
 
 .chat-input__field :deep(.q-field__native) {
   border-radius: 24px;
-  padding: 12px 16px;
+  padding: 12px;
   font-size: 16px;
   line-height: 1.4;
 }
@@ -206,33 +163,6 @@ defineExpose({
   position: relative;
 }
 
-.chat-input__char-count {
-  position: absolute;
-  bottom: 8px;
-  right: 80px;
-  font-size: 11px;
-  color: #999;
-  background: rgba(255, 255, 255, 0.9);
-  padding: 2px 6px;
-  border-radius: 8px;
-  z-index: 1;
-}
-
-.chat-input__suggestions {
-  margin-top: 12px;
-  display: flex;
-  justify-content: center;
-}
-
-.chat-input__suggestion-chip {
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.chat-input__suggestion-chip:hover {
-  transform: translateY(-1px);
-}
-
 /* Responsive Design */
 /* Large Desktop (1440px+) */
 @media (min-width: 1440px) {
@@ -243,10 +173,6 @@ defineExpose({
   .chat-input__field :deep(.q-field__native) {
     padding: 16px 20px;
     font-size: 16px;
-  }
-
-  .chat-input__suggestions {
-    margin-top: 16px;
   }
 }
 
@@ -289,11 +215,6 @@ defineExpose({
     font-size: 16px; /* Prevent zoom on iOS */
   }
 
-  .chat-input__char-count {
-    right: 75px;
-    font-size: 11px;
-  }
-
   .chat-input__send-btn {
     margin-right: 6px;
   }
@@ -322,42 +243,9 @@ defineExpose({
     line-height: 1.3;
   }
 
-  .chat-input__char-count {
-    right: 65px;
-    font-size: 10px;
-    bottom: 6px;
-  }
-
   .chat-input__send-btn {
     margin-right: 4px;
     padding: 8px;
-  }
-
-  .chat-input__suggestions {
-    margin-top: 10px;
-  }
-}
-
-/* Force light theme regardless of system preference */
-@media (prefers-color-scheme: dark) {
-  .chat-input {
-    background: #ffffff !important;
-    border-top-color: #e0e0e0 !important;
-    color: #333333 !important;
-  }
-
-  .chat-input__char-count {
-    background: rgba(255, 255, 255, 0.9) !important;
-    color: #666666 !important;
-  }
-
-  .chat-input__field :deep(.q-field__control) {
-    background: #ffffff !important;
-    color: #333333 !important;
-  }
-
-  .chat-input__field :deep(.q-field__native) {
-    color: #333333 !important;
   }
 }
 </style>
