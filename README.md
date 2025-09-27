@@ -2,6 +2,10 @@
 
 An AI-powered chatroom interface for smart medical supply procurement, built with Vue 3 and Quasar Framework.
 
+## Demo
+
+**Demo**: [https://ddylanlinn.github.io/nitra-chatroom/](https://ddylanlinn.github.io/nitra-chatroom/)
+
 ## Quick Start
 
 ### Installation & Development
@@ -50,11 +54,13 @@ src/
 ### Core Features
 
 1. **Mock Data Processing**
+
    - Parses predefined JSON responses
    - Supports exact and fuzzy keyword matching
    - Extracts product information from markdown content
 
 2. **Chat Interface**
+
    - Real-time typing animation for AI responses
    - Message history management
    - Responsive design for all devices
