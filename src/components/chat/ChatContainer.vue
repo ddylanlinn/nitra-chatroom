@@ -4,11 +4,7 @@
     <div class="chat-container__header">
       <div class="chat-container__header-content">
         <div class="chat-container__brand">
-          <img
-            src="icons/Emblems.png"
-            alt="Nitra AI"
-            class="chat-container__brand-icon"
-          />
+          <img src="icons/Emblems.png" alt="Nitra AI" class="chat-container__brand-icon" />
           <span class="chat-container__brand-text">Nitra AI</span>
         </div>
 
@@ -32,11 +28,7 @@
       <div v-if="messages.length === 0" class="chat-container__empty">
         <div class="chat-container__welcome">
           <div class="chat-container__welcome-icon-wrapper">
-            <img
-              src="icons/Emblems.png"
-              alt="Nitra AI"
-              class="chat-container__welcome-icon"
-            />
+            <img src="icons/Emblems.png" alt="Nitra AI" class="chat-container__welcome-icon" />
           </div>
           <h6 class="q-ma-none q-mt-md">Welcome to Nitra AI!</h6>
           <p class="text-grey-7 q-mt-none text-center">
@@ -84,44 +76,44 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, nextTick, watch, onMounted } from "vue";
-import { useChatStore } from "../../stores/chat";
-import MessageBubble from "./MessageBubble.vue";
-import ChatInput from "./ChatInput.vue";
-import type { Message } from "../../types";
+import { ref, computed, nextTick, watch, onMounted } from 'vue'
+import { useChatStore } from '../../stores/chat'
+import MessageBubble from './MessageBubble.vue'
+import ChatInput from './ChatInput.vue'
+import type { Message } from '../../types'
 
-const chatStore = useChatStore();
+const chatStore = useChatStore()
 
-const messagesRef = ref<HTMLElement>();
-const inputRef = ref();
+const messagesRef = ref<HTMLElement>()
+const inputRef = ref()
 
-const messages = computed(() => chatStore.messages);
-const isLoading = computed(() => chatStore.isLoading);
-const isThinking = computed(() => chatStore.isThinking);
+const messages = computed(() => chatStore.messages)
+const isLoading = computed(() => chatStore.isLoading)
+const isThinking = computed(() => chatStore.isThinking)
 
 // TODO: Implement proper close functionality
 const handleClose = () => {
   // Close chat functionality to be implemented
-};
+}
 
 const handleSendMessage = async (message: string) => {
-  await chatStore.sendMessage(message);
-};
+  await chatStore.sendMessage(message)
+}
 
 const scrollToBottom = async () => {
-  await nextTick();
+  await nextTick()
   if (messagesRef.value) {
-    messagesRef.value.scrollTop = messagesRef.value.scrollHeight;
+    messagesRef.value.scrollTop = messagesRef.value.scrollHeight
   }
-};
+}
 
 // Watch for new messages and scroll
 watch(
   () => messages.value.length,
   () => {
-    scrollToBottom();
-  }
-);
+    scrollToBottom()
+  },
+)
 
 // Watch for loading state changes
 watch(
@@ -129,19 +121,19 @@ watch(
   () => {
     if (!isLoading.value) {
       // Scroll when loading completes (message finished)
-      setTimeout(scrollToBottom, 100);
+      setTimeout(scrollToBottom, 100)
     }
-  }
-);
+  },
+)
 
 // Scroll to bottom on mount
 onMounted(() => {
-  scrollToBottom();
-});
+  scrollToBottom()
+})
 </script>
 
 <style scoped lang="scss">
-@import "../../css/app.scss";
+@import '../../css/app.scss';
 
 .chat-container {
   width: 100%;

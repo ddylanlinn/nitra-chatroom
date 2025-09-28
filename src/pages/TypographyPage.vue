@@ -2,9 +2,7 @@
   <q-page class="q-pa-md">
     <div class="text-h4 q-mb-lg">Typography</div>
 
-    <div class="text-body1 q-mb-md text-grey-7">
-      This is the typography system for the app.
-    </div>
+    <div class="text-body1 q-mb-md text-grey-7">This is the typography system for the app.</div>
 
     <div v-for="size in fontSizes" :key="size.size">
       <div :class="`font-${size.size}`">{{ size.name }}</div>

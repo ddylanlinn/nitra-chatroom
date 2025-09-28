@@ -10,11 +10,7 @@
     <div class="q-mb-xl">
       <div class="text-h6 q-mb-md">Primary Colors</div>
       <div class="row q-gutter-md">
-        <ColorCard
-          v-for="color in primaryColors"
-          :key="color.name"
-          :color="color"
-        />
+        <ColorCard v-for="color in primaryColors" :key="color.name" :color="color" />
       </div>
     </div>
 
@@ -22,11 +18,7 @@
     <div class="q-mb-xl">
       <div class="text-h6 q-mb-md">Semantic Colors</div>
       <div class="row q-gutter-md">
-        <ColorCard
-          v-for="color in semanticColors"
-          :key="color.name"
-          :color="color"
-        />
+        <ColorCard v-for="color in semanticColors" :key="color.name" :color="color" />
       </div>
     </div>
 
@@ -34,11 +26,7 @@
     <div v-for="palette in colorPalettes" :key="palette.name" class="q-mb-xl">
       <div class="text-h6 q-mb-md">{{ palette.name }}</div>
       <div class="row q-gutter-md">
-        <ColorCard
-          v-for="color in palette.colors"
-          :key="color.name"
-          :color="color"
-        />
+        <ColorCard v-for="color in palette.colors" :key="color.name" :color="color" />
       </div>
     </div>
   </q-page>
@@ -47,19 +35,18 @@
 <script setup>
 import ColorCard from 'components/ColorCard.vue'
 
-
 const primaryColors = [
   { name: 'Primary', hex: '#264D4F', class: 'primary' },
   { name: 'Secondary', hex: '#115383', class: 'secondary' },
   { name: 'Accent', hex: '#FB7429', class: 'accent' },
   { name: 'Dark', hex: '#1D1D1D', class: 'dark' },
-  { name: 'Dark Page', hex: '#121212', class: 'dark-page' }
+  { name: 'Dark Page', hex: '#121212', class: 'dark-page' },
 ]
 const semanticColors = [
   { name: 'Positive', hex: '#15B471', class: 'positive' },
   { name: 'Negative', hex: '#C71A1A', class: 'negative' },
   { name: 'Info', hex: '#2694E3', class: 'info' },
-  { name: 'Warning', hex: '#FADD00', class: 'warning' }
+  { name: 'Warning', hex: '#FADD00', class: 'warning' },
 ]
 const colorPalettes = [
   {
@@ -75,8 +62,8 @@ const colorPalettes = [
       { name: 'Gray 600', hex: '#73838C', class: 'grey-7' },
       { name: 'Gray 700', hex: '#5C6970', class: 'grey-8' },
       { name: 'Gray 800', hex: '#454F54', class: 'grey-9' },
-      { name: 'Gray 900', hex: '#2E3538', class: 'grey-10' }
-    ]
+      { name: 'Gray 900', hex: '#2E3538', class: 'grey-10' },
+    ],
   },
   {
     name: 'Teal',
@@ -91,8 +78,8 @@ const colorPalettes = [
       { name: 'Teal 600', hex: '#2E5E60', class: 'teal-7' },
       { name: 'Teal 700', hex: '#264D4F', class: 'teal-8' },
       { name: 'Teal 800', hex: '#1E3C3E', class: 'teal-9' },
-      { name: 'Teal 900', hex: '#162B2D', class: 'teal-10' }
-    ]
+      { name: 'Teal 900', hex: '#162B2D', class: 'teal-10' },
+    ],
   },
   {
     name: 'Blue',
@@ -107,8 +94,8 @@ const colorPalettes = [
       { name: 'Blue 600', hex: '#1567A2', class: 'blue-7' },
       { name: 'Blue 700', hex: '#115383', class: 'blue-8' },
       { name: 'Blue 800', hex: '#0C3C5F', class: 'blue-9' },
-      { name: 'Blue 900', hex: '#092B44', class: 'blue-10' }
-    ]
+      { name: 'Blue 900', hex: '#092B44', class: 'blue-10' },
+    ],
   },
   {
     name: 'Green',
@@ -123,8 +110,8 @@ const colorPalettes = [
       { name: 'Green 600', hex: '#11925C', class: 'green-7' },
       { name: 'Green 700', hex: '#0D7248', class: 'green-8' },
       { name: 'Green 800', hex: '#095234', class: 'green-9' },
-      { name: 'Green 900', hex: '#063723', class: 'green-10' }
-    ]
+      { name: 'Green 900', hex: '#063723', class: 'green-10' },
+    ],
   },
   {
     name: 'Yellow',
@@ -139,8 +126,8 @@ const colorPalettes = [
       { name: 'Yellow 600', hex: '#DEC60C', class: 'yellow-7' },
       { name: 'Yellow 700', hex: '#B8A40A', class: 'yellow-8' },
       { name: 'Yellow 800', hex: '#918108', class: 'yellow-9' },
-      { name: 'Yellow 900', hex: '#6A5F06', class: 'yellow-10' }
-    ]
+      { name: 'Yellow 900', hex: '#6A5F06', class: 'yellow-10' },
+    ],
   },
   {
     name: 'Amber',
@@ -155,8 +142,8 @@ const colorPalettes = [
       { name: 'Amber 600', hex: '#C27D14', class: 'amber-7' },
       { name: 'Amber 700', hex: '#9D6510', class: 'amber-8' },
       { name: 'Amber 800', hex: '#7D500D', class: 'amber-9' },
-      { name: 'Amber 900', hex: '#583809', class: 'amber-10' }
-    ]
+      { name: 'Amber 900', hex: '#583809', class: 'amber-10' },
+    ],
   },
   {
     name: 'Orange',
@@ -171,8 +158,8 @@ const colorPalettes = [
       { name: 'Orange 600', hex: '#C94A03', class: 'orange-7' },
       { name: 'Orange 700', hex: '#A13B02', class: 'orange-8' },
       { name: 'Orange 800', hex: '#792C02', class: 'orange-9' },
-      { name: 'Orange 900', hex: '#501D01', class: 'orange-10' }
-    ]
+      { name: 'Orange 900', hex: '#501D01', class: 'orange-10' },
+    ],
   },
   {
     name: 'Red',
@@ -187,10 +174,8 @@ const colorPalettes = [
       { name: 'Red 600', hex: '#991414', class: 'red-7' },
       { name: 'Red 700', hex: '#831111', class: 'red-8' },
       { name: 'Red 800', hex: '#6C0E0E', class: 'red-9' },
-      { name: 'Red 900', hex: '#480909', class: 'red-10' }
-    ]
-  }
+      { name: 'Red 900', hex: '#480909', class: 'red-10' },
+    ],
+  },
 ]
 </script>
-
-

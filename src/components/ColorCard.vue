@@ -29,16 +29,18 @@
 <script setup>
 import { copyToClipboard as quasarCopy, useQuasar } from 'quasar'
 const props = defineProps({
-    color: {
-      type: Object,
-      required: true,
-      validator(value) {
-        return value &&
-               typeof value.name === 'string' &&
-               typeof value.hex === 'string' &&
-               typeof value.class === 'string'
-    }
-  }
+  color: {
+    type: Object,
+    required: true,
+    validator(value) {
+      return (
+        value &&
+        typeof value.name === 'string' &&
+        typeof value.hex === 'string' &&
+        typeof value.class === 'string'
+      )
+    },
+  },
 })
 
 const $q = useQuasar()
@@ -48,10 +50,9 @@ async function copyToClipboard(text) {
     message: 'Copied to clipboard',
     color: 'white',
     textColor: 'primary',
-    icon: 'check'
+    icon: 'check',
   })
 }
-
 </script>
 
 <style scoped>
@@ -60,7 +61,9 @@ async function copyToClipboard(text) {
   border: 1px solid #e0e0e0;
   border-radius: 8px;
   overflow: hidden;
-  transition: transform 0.2s, box-shadow 0.2s;
+  transition:
+    transform 0.2s,
+    box-shadow 0.2s;
   cursor: pointer;
 }
 

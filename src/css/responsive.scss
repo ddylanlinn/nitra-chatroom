@@ -144,7 +144,7 @@ $container-xl: 1200px;
 
 .show-mobile-only {
   display: none !important;
-  
+
   @include mobile-small {
     display: block !important;
   }
@@ -155,7 +155,7 @@ $container-xl: 1200px;
 
 .show-tablet-only {
   display: none !important;
-  
+
   @include tablet {
     display: block !important;
   }
@@ -163,7 +163,7 @@ $container-xl: 1200px;
 
 .show-desktop-only {
   display: none !important;
-  
+
   @include desktop {
     display: block !important;
   }

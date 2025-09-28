@@ -10,20 +10,13 @@
   >
     <div v-if="message.role === 'assistant'" class="message-bubble__avatar">
       <div class="message-bubble__avatar-wrapper">
-        <img
-          src="icons/Emblems.png"
-          alt="Assistant"
-          class="message-bubble__avatar-icon"
-        />
+        <img src="icons/Emblems.png" alt="Assistant" class="message-bubble__avatar-icon" />
       </div>
     </div>
 
     <div class="message-bubble__content">
       <!-- Thinking animation -->
-      <div
-        v-if="isThinking"
-        class="message-bubble__text message-bubble__thinking"
-      >
+      <div v-if="isThinking" class="message-bubble__text message-bubble__thinking">
         <span class="message-bubble__thinking-text">Thinking</span>
         <div class="message-bubble__thinking-dots">
           <span></span>
@@ -55,144 +48,138 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, onUnmounted, watch } from "vue";
-import { useTypingAnimation } from "../../composables/useTypingAnimation";
-import type { Message } from "../../types";
+import { computed, onMounted, onUnmounted, watch } from 'vue'
+import { useTypingAnimation } from '../../composables/useTypingAnimation'
+import type { Message } from '../../types'
 
 interface Props {
-  message: Message;
-  enableTypingAnimation?: boolean;
-  isThinking?: boolean;
+  message: Message
+  enableTypingAnimation?: boolean
+  isThinking?: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
   enableTypingAnimation: true,
   isThinking: false,
-});
+})
 
 const shouldUseTypingAnimation = computed(() => {
-  return props.message.role === "assistant" && props.enableTypingAnimation;
-});
+  return props.message.role === 'assistant' && props.enableTypingAnimation
+})
 
 const typing = useTypingAnimation(props.message.content, {
   speed: 30, // 30ms per character for smooth typing
   delay: 300, // 300ms delay before starting
-});
+})
 
 // Emit events for typing animation
 const emit = defineEmits<{
-  typingProgress: [];
-  typingComplete: [];
-}>();
+  typingProgress: []
+  typingComplete: []
+}>()
 
 // Watch typing progress and emit events
 watch(
   () => typing.displayedText.value,
   () => {
     if (shouldUseTypingAnimation.value) {
-      emit("typingProgress");
+      emit('typingProgress')
     }
-  }
-);
+  },
+)
 
 watch(
   () => typing.isCompleted.value,
   (isCompleted) => {
     if (isCompleted && shouldUseTypingAnimation.value) {
-      emit("typingComplete");
+      emit('typingComplete')
     }
-  }
-);
+  },
+)
 
 const formatMarkdown = (content: string) => {
-  let formatted = content;
+  let formatted = content
 
   // Sanitize input to prevent XSS
   const escapeHtml = (text: string) => {
-    const div = document.createElement("div");
-    div.textContent = text;
-    return div.innerHTML;
-  };
+    const div = document.createElement('div')
+    div.textContent = text
+    return div.innerHTML
+  }
 
   // Convert **bold** to <strong>
   formatted = formatted.replace(
     /\*\*(.*?)\*\*/g,
-    (match, text) => `<strong>${escapeHtml(text)}</strong>`
-  );
+    (match, text) => `<strong>${escapeHtml(text)}</strong>`,
+  )
 
   // Convert [text](url) to <a>, with special styling for Product Link
-  formatted = formatted.replace(
-    /\[([^\]]+)\]\(([^)]+)\)/g,
-    (match, text, url) => {
-      // Validate URL format
-      try {
-        const parsedUrl = new URL(url);
-        const linkClass =
-          text === "Product Link" ? "message-bubble__product-link" : "";
-        return `<a href="${
-          parsedUrl.href
-        }" target="_blank" rel="noopener noreferrer" class="${linkClass}">${escapeHtml(
-          text
-        )}</a>`;
-      } catch {
-        // Invalid URL, return escaped text
-        return escapeHtml(text);
-      }
+  formatted = formatted.replace(/\[([^\]]+)\]\(([^)]+)\)/g, (match, text, url) => {
+    // Validate URL format
+    try {
+      const parsedUrl = new URL(url)
+      const linkClass = text === 'Product Link' ? 'message-bubble__product-link' : ''
+      return `<a href="${
+        parsedUrl.href
+      }" target="_blank" rel="noopener noreferrer" class="${linkClass}">${escapeHtml(text)}</a>`
+    } catch {
+      // Invalid URL, return escaped text
+      return escapeHtml(text)
     }
-  );
+  })
 
   // Convert line breaks to <br>
-  formatted = formatted.replace(/\n/g, "<br>");
+  formatted = formatted.replace(/\n/g, '<br>')
 
-  return formatted;
-};
+  return formatted
+}
 
 const formattedTypingContent = computed(() => {
-  return formatMarkdown(typing.displayedText.value);
-});
+  return formatMarkdown(typing.displayedText.value)
+})
 
 const formattedContent = computed(() => {
-  return formatMarkdown(props.message.content);
-});
+  return formatMarkdown(props.message.content)
+})
 
 const startAnimation = () => {
   if (shouldUseTypingAnimation.value) {
-    typing.startTyping();
+    typing.startTyping()
   }
-};
+}
 
 const skipAnimation = () => {
   if (shouldUseTypingAnimation.value && !typing.isCompleted.value) {
-    typing.skipTyping();
+    typing.skipTyping()
   }
-};
+}
 
 onMounted(() => {
-  startAnimation();
-});
+  startAnimation()
+})
 
 onUnmounted(() => {
-  typing.cleanup();
-});
+  typing.cleanup()
+})
 
 const formatTimestamp = (timestamp: string) => {
-  const date = new Date(timestamp);
-  const now = new Date();
-  const diffMs = now.getTime() - date.getTime();
-  const diffHours = diffMs / (1000 * 60 * 60);
+  const date = new Date(timestamp)
+  const now = new Date()
+  const diffMs = now.getTime() - date.getTime()
+  const diffHours = diffMs / (1000 * 60 * 60)
 
   if (diffHours < 24) {
     // Show time only if within 24 hours
-    return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+    return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
   } else {
     // Show date if older
-    return date.toLocaleDateString([], { month: "short", day: "numeric" });
+    return date.toLocaleDateString([], { month: 'short', day: 'numeric' })
   }
-};
+}
 </script>
 
 <style scoped lang="scss">
-@import "../../css/app.scss";
+@import '../../css/app.scss';
 .message-bubble {
   display: flex;
   margin-bottom: 16px;

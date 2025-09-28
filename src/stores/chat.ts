@@ -1,101 +1,95 @@
-import { defineStore } from "pinia";
-import { ref, computed } from "vue";
-import type { Message, ChatState } from "../types";
-import { parseMockData } from "../composables/useMockDataParser";
-import { createMessage, ERROR_MESSAGES } from "../utils/messageUtils";
+import { defineStore } from 'pinia'
+import { ref, computed } from 'vue'
+import type { Message, ChatState } from '../types'
+import { parseMockData } from '../composables/useMockDataParser'
+import { createMessage, ERROR_MESSAGES } from '../utils/messageUtils'
 
-export const useChatStore = defineStore("chat", () => {
-  const messages = ref<Message[]>([]);
-  const isLoading = ref(false);
-  const isThinking = ref(false);
-  const currentTypingMessage = ref<Message | undefined>(undefined);
+export const useChatStore = defineStore('chat', () => {
+  const messages = ref<Message[]>([])
+  const isLoading = ref(false)
+  const isThinking = ref(false)
+  const currentTypingMessage = ref<Message | undefined>(undefined)
 
   const chatState = computed<ChatState>(() => ({
     messages: messages.value,
     isLoading: isLoading.value,
     isThinking: isThinking.value,
     currentTypingMessage: currentTypingMessage.value,
-  }));
+  }))
 
   const lastMessage = computed((): Message | undefined => {
-    return messages.value[messages.value.length - 1];
-  });
+    return messages.value[messages.value.length - 1]
+  })
 
   // Actions
   const addMessage = (message: Message) => {
-    messages.value.push(message);
-  };
+    messages.value.push(message)
+  }
 
   const setLoading = (loading: boolean) => {
-    isLoading.value = loading;
-  };
+    isLoading.value = loading
+  }
 
   const setThinking = (thinking: boolean) => {
-    isThinking.value = thinking;
-  };
+    isThinking.value = thinking
+  }
 
-  const handleAssistantResponse = async (
-    userMessage: string
-  ): Promise<void> => {
+  const handleAssistantResponse = async (userMessage: string): Promise<void> => {
     // Start thinking animation
-    setThinking(true);
+    setThinking(true)
 
     // Simulate AI response time (1-2 seconds)
-    const responseTime = Math.random() * 1000 + 1000;
-    await new Promise((resolve) => setTimeout(resolve, responseTime));
+    const responseTime = Math.random() * 1000 + 1000
+    await new Promise((resolve) => setTimeout(resolve, responseTime))
 
     // Stop thinking animation
-    setThinking(false);
+    setThinking(false)
 
     // Parse mock data to get response
-    const parsedResponse = parseMockData(userMessage);
+    const parsedResponse = parseMockData(userMessage)
 
     if (parsedResponse) {
-      addMessage(parsedResponse.message);
+      addMessage(parsedResponse.message)
     } else {
       // Default response if no match found
-      const defaultMsg = createMessage("assistant", ERROR_MESSAGES.DEFAULT);
-      addMessage(defaultMsg);
+      const defaultMsg = createMessage('assistant', ERROR_MESSAGES.DEFAULT)
+      addMessage(defaultMsg)
     }
-  };
+  }
 
   const sendMessage = async (userMessage: string) => {
     // Add user message
-    const userMsg = createMessage("user", userMessage);
-    addMessage(userMsg);
+    const userMsg = createMessage('user', userMessage)
+    addMessage(userMsg)
 
-    setLoading(true);
+    setLoading(true)
 
     try {
-      await handleAssistantResponse(userMessage);
+      await handleAssistantResponse(userMessage)
     } catch (error) {
-      console.error("Error processing message:", error);
+      console.error('Error processing message:', error)
 
       // Provide more specific error messages based on error type
-      let errorMessage = ERROR_MESSAGES.PROCESSING_ERROR;
+      let errorMessage = ERROR_MESSAGES.PROCESSING_ERROR
       if (error instanceof Error) {
-        if (
-          error.message.includes("network") ||
-          error.message.includes("fetch")
-        ) {
-          errorMessage =
-            "Network error. Please check your connection and try again.";
-        } else if (error.message.includes("timeout")) {
-          errorMessage = "Request timed out. Please try again.";
+        if (error.message.includes('network') || error.message.includes('fetch')) {
+          errorMessage = 'Network error. Please check your connection and try again.'
+        } else if (error.message.includes('timeout')) {
+          errorMessage = 'Request timed out. Please try again.'
         }
       }
 
-      const errorMsg = createMessage("assistant", errorMessage);
-      addMessage(errorMsg);
+      const errorMsg = createMessage('assistant', errorMessage)
+      addMessage(errorMsg)
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
   const clearMessages = () => {
-    messages.value = [];
-    currentTypingMessage.value = undefined;
-  };
+    messages.value = []
+    currentTypingMessage.value = undefined
+  }
 
   return {
     // State
@@ -114,5 +108,5 @@ export const useChatStore = defineStore("chat", () => {
     setThinking,
     sendMessage,
     clearMessages,
-  };
-});
+  }
+})

@@ -1,188 +1,176 @@
-import { ref, computed, onUnmounted } from "vue";
-import type { TypingConfig } from "../types";
+import { ref, computed, onUnmounted } from 'vue'
+import type { TypingConfig } from '../types'
 
 enum TypingStatus {
-  IDLE = "idle",
-  DELAYING = "delaying",
-  TYPING = "typing",
-  PAUSED = "paused",
-  COMPLETED = "completed",
+  IDLE = 'idle',
+  DELAYING = 'delaying',
+  TYPING = 'typing',
+  PAUSED = 'paused',
+  COMPLETED = 'completed',
 }
 
-export function useTypingAnimation(
-  fullText: string,
-  config: TypingConfig = {}
-) {
-  const { speed = 50, delay = 200 } = config;
+export function useTypingAnimation(fullText: string, config: TypingConfig = {}) {
+  const { speed = 50, delay = 200 } = config
 
   // Timeout mechanism to prevent infinite animations (30 seconds max)
-  const MAX_ANIMATION_TIME = 30000;
-  let animationStartTime: number | null = null;
+  const MAX_ANIMATION_TIME = 30000
+  let animationStartTime: number | null = null
 
   // State
-  const currentIndex = ref(0);
-  const status = ref(TypingStatus.IDLE);
-  const startTime = ref<number | null>(null);
+  const currentIndex = ref(0)
+  const status = ref(TypingStatus.IDLE)
+  const startTime = ref<number | null>(null)
 
   // Computed
   const displayedText = computed(() => {
-    return fullText.slice(0, currentIndex.value);
-  });
+    return fullText.slice(0, currentIndex.value)
+  })
 
   const progress = computed(() => {
-    if (!fullText || fullText.length === 0) return 1;
-    return currentIndex.value / fullText.length;
-  });
+    if (!fullText || fullText.length === 0) return 1
+    return currentIndex.value / fullText.length
+  })
 
   const remainingTime = computed(() => {
-    if (status.value !== TypingStatus.TYPING) return 0;
-    const remainingChars = fullText.length - currentIndex.value;
-    return remainingChars * speed;
-  });
+    if (status.value !== TypingStatus.TYPING) return 0
+    const remainingChars = fullText.length - currentIndex.value
+    return remainingChars * speed
+  })
 
-  const isTyping = computed(() => status.value === TypingStatus.TYPING);
-  const isCompleted = computed(() => status.value === TypingStatus.COMPLETED);
-  const isPaused = computed(() => status.value === TypingStatus.PAUSED);
+  const isTyping = computed(() => status.value === TypingStatus.TYPING)
+  const isCompleted = computed(() => status.value === TypingStatus.COMPLETED)
+  const isPaused = computed(() => status.value === TypingStatus.PAUSED)
 
   // Animation handles
-  let animationId: number | null = null;
-  let delayTimeout: number | null = null;
-  let lastFrameTime = 0;
+  let animationId: number | null = null
+  let delayTimeout: number | null = null
+  let lastFrameTime = 0
 
   const cleanup = () => {
     if (animationId) {
-      cancelAnimationFrame(animationId);
-      animationId = null;
+      cancelAnimationFrame(animationId)
+      animationId = null
     }
     if (delayTimeout) {
-      clearTimeout(delayTimeout);
-      delayTimeout = null;
+      clearTimeout(delayTimeout)
+      delayTimeout = null
     }
-  };
+  }
 
   const startTyping = () => {
-    if (
-      status.value === TypingStatus.TYPING ||
-      status.value === TypingStatus.COMPLETED
-    ) {
-      return;
+    if (status.value === TypingStatus.TYPING || status.value === TypingStatus.COMPLETED) {
+      return
     }
 
     // Edge case: empty text
     if (!fullText || fullText.length === 0) {
-      status.value = TypingStatus.COMPLETED;
-      return;
+      status.value = TypingStatus.COMPLETED
+      return
     }
 
     // Reset state
-    currentIndex.value = 0;
-    status.value = TypingStatus.DELAYING;
-    startTime.value = Date.now();
-    animationStartTime = Date.now();
+    currentIndex.value = 0
+    status.value = TypingStatus.DELAYING
+    startTime.value = Date.now()
+    animationStartTime = Date.now()
 
     // Handle delay
     if (delay > 0) {
       delayTimeout = window.setTimeout(() => {
-        delayTimeout = null;
+        delayTimeout = null
         if (status.value === TypingStatus.DELAYING) {
-          beginTyping();
+          beginTyping()
         }
-      }, delay);
+      }, delay)
     } else {
-      beginTyping();
+      beginTyping()
     }
-  };
+  }
 
   const beginTyping = () => {
     if (currentIndex.value >= fullText.length) {
-      completeTyping();
-      return;
+      completeTyping()
+      return
     }
 
-    status.value = TypingStatus.TYPING;
-    lastFrameTime = performance.now();
-    typeNextChar();
-  };
+    status.value = TypingStatus.TYPING
+    lastFrameTime = performance.now()
+    typeNextChar()
+  }
 
   const typeNextChar = () => {
     const animate = (currentTime: number) => {
       if (status.value !== TypingStatus.TYPING) {
-        animationId = null;
-        return;
+        animationId = null
+        return
       }
 
       // Safety timeout check
-      if (
-        animationStartTime &&
-        currentTime - animationStartTime > MAX_ANIMATION_TIME
-      ) {
-        console.warn("Typing animation timed out, force completing");
-        completeTyping();
-        return;
+      if (animationStartTime && currentTime - animationStartTime > MAX_ANIMATION_TIME) {
+        console.warn('Typing animation timed out, force completing')
+        completeTyping()
+        return
       }
 
       // Limit frame rate to prevent excessive CPU usage
       if (currentTime - lastFrameTime >= speed) {
         if (currentIndex.value < fullText.length) {
-          currentIndex.value++;
-          lastFrameTime = currentTime;
+          currentIndex.value++
+          lastFrameTime = currentTime
         }
 
         if (currentIndex.value >= fullText.length) {
-          completeTyping();
-          return;
+          completeTyping()
+          return
         }
       }
 
       // Throttle animation frames when not actively typing to reduce CPU usage
       if (currentIndex.value >= fullText.length) {
-        animationId = null;
+        animationId = null
       } else {
-        animationId = requestAnimationFrame(animate);
+        animationId = requestAnimationFrame(animate)
       }
-    };
+    }
 
-    animationId = requestAnimationFrame(animate);
-  };
+    animationId = requestAnimationFrame(animate)
+  }
 
   const completeTyping = () => {
-    cleanup();
-    currentIndex.value = fullText.length;
-    status.value = TypingStatus.COMPLETED;
-  };
+    cleanup()
+    currentIndex.value = fullText.length
+    status.value = TypingStatus.COMPLETED
+  }
 
   const pauseTyping = () => {
     if (status.value === TypingStatus.TYPING) {
-      cleanup();
-      status.value = TypingStatus.PAUSED;
+      cleanup()
+      status.value = TypingStatus.PAUSED
     }
-  };
+  }
 
   const resumeTyping = () => {
-    if (
-      status.value === TypingStatus.PAUSED &&
-      currentIndex.value < fullText.length
-    ) {
-      beginTyping();
+    if (status.value === TypingStatus.PAUSED && currentIndex.value < fullText.length) {
+      beginTyping()
     }
-  };
+  }
 
   const skipTyping = () => {
-    completeTyping();
-  };
+    completeTyping()
+  }
 
   const resetTyping = () => {
-    cleanup();
-    currentIndex.value = 0;
-    status.value = TypingStatus.IDLE;
-    startTime.value = null;
-    animationStartTime = null;
-  };
+    cleanup()
+    currentIndex.value = 0
+    status.value = TypingStatus.IDLE
+    startTime.value = null
+    animationStartTime = null
+  }
 
   // Auto cleanup on unmount
   onUnmounted(() => {
-    cleanup();
-  });
+    cleanup()
+  })
 
   return {
     // State
@@ -200,5 +188,5 @@ export function useTypingAnimation(
     skipTyping,
     resetTyping,
     cleanup,
-  };
+  }
 }

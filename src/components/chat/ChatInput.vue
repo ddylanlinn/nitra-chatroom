@@ -35,94 +35,94 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, nextTick } from "vue";
+import { ref, computed, nextTick } from 'vue'
 
 interface Props {
-  placeholder?: string;
-  maxLength?: number;
-  showCharCount?: boolean;
-  isLoading?: boolean;
+  placeholder?: string
+  maxLength?: number
+  showCharCount?: boolean
+  isLoading?: boolean
 }
 
 interface Emits {
-  (e: "send", message: string): void;
+  (e: 'send', message: string): void
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  placeholder: "Type your message...",
+  placeholder: 'Type your message...',
   maxLength: 1000,
   showCharCount: false,
   isLoading: false,
-});
+})
 
-const emit = defineEmits<Emits>();
+const emit = defineEmits<Emits>()
 
-const message = ref("");
-const inputRef = ref();
+const message = ref('')
+const inputRef = ref()
 
 const isValid = computed(() => {
-  const trimmed = message.value.trim();
-  return trimmed.length > 0 && trimmed.length <= props.maxLength;
-});
+  const trimmed = message.value.trim()
+  return trimmed.length > 0 && trimmed.length <= props.maxLength
+})
 
 const sendIcon = computed(() => {
-  if (props.isLoading) return "hourglass_empty";
-  return "send";
-});
+  if (props.isLoading) return 'hourglass_empty'
+  return 'send'
+})
 
 const handleSubmit = () => {
-  if (!isValid.value || props.isLoading) return;
+  if (!isValid.value || props.isLoading) return
 
-  const trimmedMessage = message.value.trim();
-  emit("send", trimmedMessage);
-  message.value = "";
+  const trimmedMessage = message.value.trim()
+  emit('send', trimmedMessage)
+  message.value = ''
 
   nextTick(() => {
-    inputRef.value?.focus();
-  });
-};
+    inputRef.value?.focus()
+  })
+}
 
 const handleKeydown = (event: KeyboardEvent) => {
   if (props.isLoading) {
-    event.preventDefault();
-    return;
+    event.preventDefault()
+    return
   }
 
   // Don't interfere with composition events (for Chinese, Japanese, Korean input)
   if (event.isComposing) {
-    return;
+    return
   }
 
-  if (event.key === "Enter" && !event.shiftKey) {
-    event.preventDefault();
+  if (event.key === 'Enter' && !event.shiftKey) {
+    event.preventDefault()
     if (isValid.value) {
-      handleSubmit();
+      handleSubmit()
     }
   }
-};
+}
 
 const handleInput = () => {
   if (props.isLoading) {
     nextTick(() => {
-      const trimmed = message.value.trim();
+      const trimmed = message.value.trim()
       if (trimmed.length === 0) {
-        message.value = "";
+        message.value = ''
       }
-    });
+    })
   }
-};
+}
 
 const focus = () => {
-  inputRef.value?.focus();
-};
+  inputRef.value?.focus()
+}
 
 defineExpose({
   focus,
-});
+})
 </script>
 
 <style scoped lang="scss">
-@import "../../css/app.scss";
+@import '../../css/app.scss';
 
 .chat-input {
   padding: 16px;
