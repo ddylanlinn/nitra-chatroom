@@ -10,7 +10,11 @@
   >
     <div v-if="message.role === 'assistant'" class="message-bubble__avatar">
       <div class="message-bubble__avatar-wrapper">
-        <img src="icons/Emblems.png" alt="Assistant" class="message-bubble__avatar-icon" />
+        <img
+          src="icons/Emblems.png"
+          alt="Assistant"
+          class="message-bubble__avatar-icon"
+        />
       </div>
     </div>
 
@@ -103,15 +107,37 @@ watch(
 const formatMarkdown = (content: string) => {
   let formatted = content;
 
+  // Sanitize input to prevent XSS
+  const escapeHtml = (text: string) => {
+    const div = document.createElement("div");
+    div.textContent = text;
+    return div.innerHTML;
+  };
+
   // Convert **bold** to <strong>
-  formatted = formatted.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>");
+  formatted = formatted.replace(
+    /\*\*(.*?)\*\*/g,
+    (match, text) => `<strong>${escapeHtml(text)}</strong>`
+  );
 
   // Convert [text](url) to <a>, with special styling for Product Link
   formatted = formatted.replace(
     /\[([^\]]+)\]\(([^)]+)\)/g,
     (match, text, url) => {
-      const linkClass = text === 'Product Link' ? 'message-bubble__product-link' : '';
-      return `<a href="${url}" target="_blank" rel="noopener noreferrer" class="${linkClass}">${text}</a>`;
+      // Validate URL format
+      try {
+        const parsedUrl = new URL(url);
+        const linkClass =
+          text === "Product Link" ? "message-bubble__product-link" : "";
+        return `<a href="${
+          parsedUrl.href
+        }" target="_blank" rel="noopener noreferrer" class="${linkClass}">${escapeHtml(
+          text
+        )}</a>`;
+      } catch {
+        // Invalid URL, return escaped text
+        return escapeHtml(text);
+      }
     }
   );
 
@@ -229,11 +255,11 @@ const formatTimestamp = (timestamp: string) => {
 }
 
 .message-bubble__text :deep(.message-bubble__product-link) {
-  color: #FB7429;
+  color: #fb7429;
 }
 
 .message-bubble__text :deep(.message-bubble__product-link:hover) {
-  color: #FB7429;
+  color: #fb7429;
   opacity: 0.8;
 }
 

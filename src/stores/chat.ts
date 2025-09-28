@@ -70,10 +70,22 @@ export const useChatStore = defineStore("chat", () => {
       await handleAssistantResponse(userMessage);
     } catch (error) {
       console.error("Error processing message:", error);
-      const errorMsg = createMessage(
-        "assistant",
-        ERROR_MESSAGES.PROCESSING_ERROR
-      );
+
+      // Provide more specific error messages based on error type
+      let errorMessage = ERROR_MESSAGES.PROCESSING_ERROR;
+      if (error instanceof Error) {
+        if (
+          error.message.includes("network") ||
+          error.message.includes("fetch")
+        ) {
+          errorMessage =
+            "Network error. Please check your connection and try again.";
+        } else if (error.message.includes("timeout")) {
+          errorMessage = "Request timed out. Please try again.";
+        }
+      }
+
+      const errorMsg = createMessage("assistant", errorMessage);
       addMessage(errorMsg);
     } finally {
       setLoading(false);
